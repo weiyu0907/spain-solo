@@ -756,6 +756,8 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(-
 #map{display:block;width:100%;aspect-ratio:1/1;user-select:none;-webkit-user-select:none}
 .mapctl{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px;z-index:1000}
 #lmap{display:none;width:100%;aspect-ratio:1/1}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) #lmap .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.9) contrast(.9)}}
+:root[data-theme="dark"] #lmap .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.9) contrast(.9)}
 .mapwrap.leaf #lmap{display:block}.mapwrap.leaf #map,.mapwrap.leaf #scale{display:none}
 .leaflet-popup-content{font-family:"Noto Sans TC","PingFang TC",sans-serif;font-size:14px;line-height:1.5;margin:10px 12px}
 .leaflet-popup-content b{font-size:15px}
@@ -1218,20 +1220,21 @@ let LM=null, LMcity=null, LMlayer=null, LMme=null, LMtiles=null, LMlv=null, leaf
 const FRAMED=(()=>{try{return window.self!==window.top;}catch(e){return true;}})();
 const darkMQ=window.matchMedia?matchMedia("(prefers-color-scheme: dark)"):null;
 function loadLeaflet(){return Promise.resolve(!FRAMED && !!window.L);}
-function tileUrl(){return (darkMQ&&darkMQ.matches)?"https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png":"https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";}
+// CARTO now watermarks keyless requests ("API KEY REQUIRED"), so use OSM directly; OSM France HOT as fallback.
+const TILE_PRIMARY={url:"https://tile.openstreetmap.org/{z}/{x}/{y}.png",sub:"abc",attr:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'};
+const TILE_FALLBACK={url:"https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",sub:"abc",attr:'&copy; OpenStreetMap, tiles OSM France'};
 function initLeaflet(){
   LM=L.map("lmap",{zoomControl:false,attributionControl:true});
-  LMtiles=L.tileLayer(tileUrl(),{maxZoom:19,subdomains:"abcd",attribution:'&copy; OpenStreetMap &copy; CARTO'}).addTo(LM);
+  LMtiles=L.tileLayer(TILE_PRIMARY.url,{maxZoom:19,subdomains:TILE_PRIMARY.sub,attribution:TILE_PRIMARY.attr}).addTo(LM);
   let errs=0, oks=0;
   LMtiles.on("tileload",()=>{oks++;});
   setTimeout(()=>{if(!oks){const r=$("#lmap").getBoundingClientRect();
     $("#mapHint").textContent=`地圖診斷：Leaflet=${!!window.L}｜圖磚 成功${oks}/失敗${errs}｜大小 ${Math.round(r.width)}×${Math.round(r.height)}｜online=${navigator.onLine}`;}},6000);
   LMtiles.on("tileerror",()=>{errs++;
-    if(errs===5&&!LM._gotTile&&!LM._osm){LM._osm=true;errs=0;LMtiles.options.subdomains="abc";LMtiles.setUrl("https://tile.openstreetmap.org/{z}/{x}/{y}.png");LMtiles.options.attribution="&copy; OpenStreetMap";return;}
+    if(errs===5&&!LM._gotTile&&!LM._osm){LM._osm=true;errs=0;LMtiles.options.subdomains=TILE_FALLBACK.sub;LMtiles.setUrl(TILE_FALLBACK.url);return;}
     if(errs>12&&LM._osm&&!LM._gotTile){leafFailed=true;$("#mapwrap").classList.remove("leaf");$("#mapHint").textContent="街道地圖載入失敗（可能沒有網路），已改用示意地圖。";renderSvgMap();}});
   LMtiles.on("tileload",()=>{LM._gotTile=true;});
   L.control.scale({imperial:false,position:"bottomleft"}).addTo(LM);
-  if(darkMQ&&darkMQ.addEventListener) darkMQ.addEventListener("change",()=>LMtiles.setUrl(tileUrl()));
 }
 function popupHtml(it,isZone){
   const d=pos?`距離你 ${fmt(dist(pos,it.p))}<br>`:"";
