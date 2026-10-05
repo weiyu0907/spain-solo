@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="西班牙獨旅">
+<title>西班牙獨旅</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F7F8FB;--card:#FFFFFF;--ink:#14213D;--muted:#5B6478;--line:#DCE1EC;
+  --cobalt:#1E3F99;--cobalt-soft:#E7ECF8;--saffron:#D99500;--saffron-soft:#FDF3D9;
+  --olive:#3F7A2E;--olive-soft:#E4F0DE;--orange:#C8551E;--orange-soft:#FBE7DC;--red:#B4232A;--red-soft:#F8DEDF;
+  --tabh:62px;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0B1222;--card:#131D35;--ink:#E9EDF7;--muted:#9AA4BC;--line:#26324F;
+  --cobalt:#86A3F2;--cobalt-soft:#18244A;--saffron:#F2BE3C;--saffron-soft:#3A2F12;
+  --olive:#8CC26F;--olive-soft:#1B2D17;--orange:#F29462;--orange-soft:#3A2216;--red:#F27A7F;--red-soft:#3B1719;}}
+:root[data-theme="dark"]{
+  --bg:#0B1222;--card:#131D35;--ink:#E9EDF7;--muted:#9AA4BC;--line:#26324F;
+  --cobalt:#86A3F2;--cobalt-soft:#18244A;--saffron:#F2BE3C;--saffron-soft:#3A2F12;
+  --olive:#8CC26F;--olive-soft:#1B2D17;--orange:#F29462;--orange-soft:#3A2216;--red:#F27A7F;--red-soft:#3B1719;}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","PingFang TC",system-ui,sans-serif;line-height:1.55;-webkit-tap-highlight-color:transparent}
+main{max-width:560px;margin:0 auto;padding:14px 16px calc(var(--tabh) + 90px + env(safe-area-inset-bottom,0px))}
+h1{font-family:"Noto Serif TC","Songti TC",serif;font-weight:900;font-size:26px;margin:6px 0 12px}
+h2{font-family:"Noto Serif TC","Songti TC",serif;font-size:19px;margin:24px 0 10px}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--saffron);outline-offset:2px}
+.view{display:none}.view.on{display:block}
+
+/* status */
+.status{border-radius:20px;padding:18px;background:var(--sbg);border:2px solid var(--sc);min-height:150px}
+.status .lv{font-family:"Noto Serif TC",serif;font-weight:900;font-size:34px;color:var(--sc);line-height:1.1}
+.status .where{font-weight:700;font-size:17px;margin-top:6px}
+.status .tip{margin:6px 0 0;font-size:15px}
+.status .small{font-size:13px;color:var(--muted);margin-top:10px}
+.s0{--sc:var(--olive);--sbg:var(--olive-soft)}.s1{--sc:var(--saffron);--sbg:var(--saffron-soft)}
+.s2{--sc:var(--orange);--sbg:var(--orange-soft)}.s3{--sc:var(--red);--sbg:var(--red-soft)}
+.sx{--sc:var(--muted);--sbg:var(--card)}
+.big{display:block;width:100%;border:0;border-radius:14px;padding:14px;font-weight:700;font-size:17px;background:var(--cobalt);color:#fff;margin-top:14px}
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.quick a,.quick button{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:var(--ink);background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px;text-align:left;font-size:15px}
+.quick b{font-size:16px}
+.quick span{font-size:13px;color:var(--muted)}
+.near{margin-top:10px;font-size:14px;color:var(--muted)}
+
+/* explore */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.chips button{border:1.5px solid var(--line);background:var(--card);padding:7px 14px;border-radius:999px;white-space:nowrap}
+.chips button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.list{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.item{border-left:5px solid var(--c);background:var(--card);border-radius:4px 14px 14px 4px;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:2px 10px}
+.item.food{--c:var(--saffron)}.item.sight{--c:var(--cobalt)}.item.danger{--c:var(--red)}.item.trans{--c:var(--olive)}.item.wc{--c:var(--muted)}
+.air{background:var(--olive-soft);border-radius:14px;padding:12px 14px;margin:10px 0;font-size:14.5px}
+.air b{display:block;margin-bottom:2px}
+.pay li{margin-bottom:8px;font-size:15px}
+.item h3{margin:0;font-size:16.5px;line-height:1.35}
+.item p{margin:2px 0 0;font-size:14.5px;grid-column:1/-1;color:var(--muted)}
+.meta{font-size:13px;color:var(--muted);text-align:right;white-space:nowrap}
+.acts{grid-column:1/-1;display:flex;gap:18px;margin-top:6px;font-size:14px}
+.acts a,.acts button{color:var(--c);font-weight:700;background:none;border:0;padding:4px 0;text-decoration:none}
+.badge{display:inline-block;font-size:12px;font-weight:700;padding:1px 8px;border-radius:999px;margin-left:6px;vertical-align:2px;color:var(--sc);background:var(--sbg)}
+
+/* me */
+.panel{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px}
+.row{display:flex;gap:8px;align-items:center}
+.row input{flex:1;min-width:0;border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:10px;font-size:16px}
+.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;background:var(--cobalt);color:#fff}
+.btn.ghost{background:transparent;color:var(--cobalt);border:1.5px solid var(--cobalt)}
+.btn.warn{background:transparent;color:var(--red);border:1.5px solid var(--red)}
+.hint{font-size:13px;color:var(--muted);margin:8px 0 0}
+.docs{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+.doc{position:relative;border-radius:12px;overflow:hidden;background:var(--bg);border:1.5px solid var(--line)}
+.doc img{display:block;width:100%;aspect-ratio:3/4;object-fit:cover}
+.doc .cap{font-size:13px;padding:6px 8px;display:flex;justify-content:space-between;gap:6px}
+.doc .cap button{background:none;border:0;color:var(--red);font-weight:700;padding:0}
+.phr{display:flex;flex-direction:column;gap:8px}
+.phr button{text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:12px 14px}
+.phr b{display:block;font-size:16px}
+.phr span{font-size:14px;color:var(--muted)}
+
+/* map */
+.mapwrap{position:relative;border:1.5px solid var(--line);border-radius:18px;overflow:hidden;background:var(--card);touch-action:none}
+#map{display:block;width:100%;aspect-ratio:1/1;user-select:none;-webkit-user-select:none}
+.mapctl{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.mapctl button{width:40px;height:40px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);font-size:20px;font-weight:700}
+.scale{position:absolute;left:10px;bottom:10px;font-size:12px;color:var(--muted)}
+.scale div{height:4px;border:2px solid var(--muted);border-top:0}
+.pick{margin-top:10px;padding:12px 14px;border-radius:14px;background:var(--card);border:1.5px solid var(--line);display:none}
+.pick.on{display:block}
+.pick h3{margin:0 0 4px;font-size:17px}
+.pick p{margin:0;font-size:14.5px;color:var(--muted)}
+.pick .row{margin-top:10px}
+.pick a{flex:1;text-align:center;text-decoration:none}
+/* translate */
+.dir{display:flex;gap:8px;margin-bottom:10px}
+.dir button{flex:1;border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:10px;font-weight:700}
+.dir button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+#trIn{width:100%;min-height:96px;border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:12px;font-size:17px;resize:vertical}
+#trOut{min-height:64px;font-size:22px;font-weight:700;line-height:1.4;padding:14px;border-radius:14px;background:var(--cobalt-soft);margin-top:10px;white-space:pre-wrap}
+#trOut:empty{display:none}
+.trrow{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.trrow>*{flex:1;text-align:center;text-decoration:none;white-space:nowrap}
+.phr .say{float:right;font-size:13px;color:var(--cobalt);font-weight:700}
+.card-full .speak{margin-top:28px;align-self:flex-start;border:0;background:#1E3F99;color:#fff;border-radius:999px;padding:12px 22px;font-weight:700;font-size:17px}
+/* tabbar + sos */
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1.5px solid var(--line);
+  padding-bottom:env(safe-area-inset-bottom,0px);display:flex;z-index:20}
+nav button{flex:1;height:var(--tabh);border:0;background:none;font-size:13px;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+nav button i{font-style:normal;font-size:21px;line-height:1}
+nav button[aria-selected="true"]{color:var(--ink);font-weight:700}
+.sos{position:fixed;right:16px;bottom:calc(var(--tabh) + 16px + env(safe-area-inset-bottom,0px));z-index:21;
+  width:68px;height:68px;border-radius:50%;border:0;background:var(--red);color:#fff;font-weight:900;font-size:19px;
+  box-shadow:0 6px 18px rgba(180,35,42,.4)}
+
+/* overlays */
+.sheet{position:fixed;inset:0;z-index:40;background:rgba(10,15,30,.55);display:none;align-items:flex-end;justify-content:center}
+.sheet.on{display:flex}
+.sheet .box{background:var(--card);width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+.sheet .box h2{margin-top:0}
+.sheet a.big,.sheet button.big{text-align:center;text-decoration:none}
+.sheet .call{background:var(--red)}
+.sheet .close{background:transparent;color:var(--muted);border:1.5px solid var(--line)}
+.card-full{position:fixed;inset:0;z-index:50;background:#FFFFFF;color:#14213D;display:none;flex-direction:column;justify-content:center;
+  padding:calc(24px + env(safe-area-inset-top,0px)) 24px calc(24px + env(safe-area-inset-bottom,0px))}
+.card-full.on{display:flex}
+.card-full .es{font-size:clamp(34px,10vw,56px);font-weight:900;line-height:1.2}
+.card-full .zh{font-size:18px;color:#5B6478;margin-top:18px}
+.card-full .x{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:16px;border:0;background:#E7ECF8;border-radius:999px;padding:8px 14px;font-weight:700;color:#14213D}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tabh) + 100px + env(safe-area-inset-bottom,0px));
+  background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;z-index:60;display:none}
+.toast.on{display:block}
+</style>
+</head>
+<body>
+<main>
+  <!-- NOW -->
+  <section class="view on" id="v-now">
+    <h1>現在</h1>
+    <div class="status sx" id="status">
+      <div class="lv" id="stLv">尚未定位</div>
+      <div class="where" id="stWhere">按下方按鈕開始</div>
+      <p class="tip" id="stTip">定位只在這個頁面開著時運作，不會上傳到任何地方。</p>
+      <div class="small" id="stSmall"></div>
+    </div>
+    <button class="big" id="locBtn">開始定位</button>
+    <div class="near" id="nearZone"></div>
+
+    <div class="quick">
+      <a id="qPolice" href="https://www.google.com/maps/search/comisaria+policia" target="_blank" rel="noopener"><b>附近警察局</b><span>Google 地圖搜尋</span></a>
+      <a id="qPharm" href="https://www.google.com/maps/search/farmacia" target="_blank" rel="noopener"><b>附近藥局</b><span>綠色十字招牌</span></a>
+      <button id="qWc"><b>找廁所</b><span>附近咖啡廳、百貨、速食店</span></button>
+      <a id="qTaxi" href="https://www.google.com/maps/search/parada+de+taxi" target="_blank" rel="noopener"><b>附近計程車招呼站</b><span>只搭白車有綠燈的正規計程車</span></a>
+      <button data-share><b>傳位置給家人</b><span>LINE、訊息都可以</span></button>
+      <button data-goto="tr"><b>求助字卡</b><span>拿給當地人看</span></button>
+    </div>
+
+    <h2>最常見的 4 種偷竊手法</h2>
+    <div class="list">
+      <div class="item danger"><h3>地鐵門口擠人</h3><p>車門關閉前一群人擠上又擠下。手機和錢包別放後口袋，背包背在胸前。</p></div>
+      <div class="item danger"><h3>迷迭香、連署簽名</h3><p>塞東西給你或請你簽名，就是要讓你停下來。不接、不停、直接走。</p></div>
+      <div class="item danger"><h3>潑髒東西再幫你擦</h3><p>有人說你衣服髒了要幫忙，手護住包包，走到店裡再自己處理。</p></div>
+      <div class="item danger"><h3>餐廳桌上放手機</h3><p>有人拿地圖或傳單蓋住你的手機再一起拿走。手機收進包包。</p></div>
+    </div>
+  </section>
+
+  <!-- EXPLORE -->
+  <section class="view" id="v-explore">
+    <h1>地圖</h1>
+    <div class="chips" id="cities"></div>
+    <div class="mapwrap" id="mapwrap">
+      <svg id="map" aria-label="城市示意地圖：危險區與地點"></svg>
+      <div class="mapctl">
+        <button id="zIn" aria-label="放大">+</button>
+        <button id="zOut" aria-label="縮小">−</button>
+        <button id="zMe" aria-label="回到我的位置">◎</button>
+      </div>
+      <div class="scale" id="scale"></div>
+    </div>
+    <div class="pick" id="pick"></div>
+    <p class="hint">示意地圖：紅圈是危險區範圍（依目前時段深淺），沒有街道。要走路線請按「導航」。</p>
+    <div class="chips" id="filters">
+      <button data-f="all" aria-pressed="true">全部</button>
+      <button data-f="danger" aria-pressed="false">危險區</button>
+      <button data-f="food" aria-pressed="false">美食</button>
+      <button data-f="sight" aria-pressed="false">景點</button>
+      <button data-f="trans" aria-pressed="false">交通</button>
+      <button data-f="wc" aria-pressed="false">廁所</button>
+      <button data-f="fav" aria-pressed="false">★ 收藏</button>
+    </div>
+    <div class="air" id="air"></div>
+    <div class="hint" id="baseHint"></div>
+    <div class="list" id="list"></div>
+  </section>
+
+  <!-- TRANSLATE -->
+  <section class="view" id="v-tr">
+    <h1>翻譯</h1>
+    <div class="dir" id="dir">
+      <button data-d="zh2es" aria-pressed="true">中文 → 西文</button>
+      <button data-d="es2zh" aria-pressed="false">西文 → 中文</button>
+    </div>
+    <textarea id="trIn" placeholder="輸入或按鍵盤上的麥克風用說的"></textarea>
+    <div class="trrow">
+      <button class="btn" id="trGo">翻譯</button>
+      <a class="btn ghost" id="trG" href="https://translate.google.com/" target="_blank" rel="noopener">用 Google 翻譯</a>
+    </div>
+    <p class="hint" id="trNote"></p>
+    <div id="trOut" aria-live="polite"></div>
+    <div class="trrow" id="trActs" style="display:none">
+      <button class="btn ghost" id="trSay">朗讀</button>
+      <button class="btn ghost" id="trFull">全螢幕給對方看</button>
+    </div>
+    <p class="hint">看菜單、標示：用 iPhone 內建「翻譯」App 的相機功能，先在 App 裡下載西班牙文，沒網路也能用。</p>
+
+    <h2>求助字卡（離線可用）</h2>
+    <div class="phr" id="phrases"></div>
+  </section>
+
+  <!-- ME -->
+  <section class="view" id="v-me">
+    <h1>我的</h1>
+
+    <h2 style="margin-top:4px">緊急聯絡人</h2>
+    <div class="panel">
+      <div class="row">
+        <input id="ecPhone" type="tel" inputmode="tel" placeholder="+886 912 345 678" autocomplete="tel">
+        <button class="btn" id="ecSave">儲存</button>
+      </div>
+      <p class="hint">按 SOS 後的「傳簡訊」會傳到這支號碼。台灣號碼記得加 +886、去掉開頭的 0。</p>
+    </div>
+
+    <h2>付款怎麼準備</h2>
+    <div class="panel"><ul class="pay" style="margin:0;padding-left:20px">
+      <li><b>主力：Apple Pay 綁海外回饋信用卡。</b>西班牙感應付款非常普及，手機被偷時卡號也不會外流。</li>
+      <li><b>刷卡機問要付台幣還是歐元，一律選歐元（EUR）。</b>選台幣會被動態貨幣轉換多收約 3–7%。</li>
+      <li><b>備援：另一張不同發卡組織的實體卡</b>（Visa 配 Mastercard），跟主卡分開放。</li>
+      <li><b>現金 50–100 歐元</b>：市場小攤、小酒館、車站付費廁所的硬幣。</li>
+      <li><b>提款用銀行 ATM</b>（Santander、BBVA、CaixaBank），最好在銀行室內；街邊 Euronet 手續費高。同樣拒絕匯率轉換。</li>
+      <li><b>購物退稅</b>：西班牙沒有最低消費門檻，結帳時要退稅單，離境前在機場 DIVA 機器掃描。</li>
+      <li>把每張卡的<b>海外掛失電話</b>拍照存進下面的證件備份，並在銀行 App 開好「暫停卡片」功能。</li>
+    </ul></div>
+
+    <h2>證件備份（加密）</h2>
+    <div class="panel" id="vault"></div>
+    <p class="hint">照片用你設定的 PIN 以 AES-256 加密，只存在這支手機。忘記 PIN 就無法解開，也無法找回。</p>
+  </section>
+</main>
+
+<button class="sos" id="sosBtn" aria-label="緊急求助">SOS</button>
+
+<nav role="tablist">
+  <button role="tab" aria-selected="true" data-tab="now"><i>◉</i>現在</button>
+  <button role="tab" aria-selected="false" data-tab="explore"><i>⌖</i>地圖</button>
+  <button role="tab" aria-selected="false" data-tab="tr"><i>文</i>翻譯</button>
+  <button role="tab" aria-selected="false" data-tab="me"><i>☰</i>我的</button>
+</nav>
+
+<div class="sheet" id="sosSheet" role="dialog" aria-modal="true" aria-label="緊急求助">
+  <div class="box">
+    <h2>緊急求助</h2>
+    <a class="big call" href="tel:112">撥打 112（警察、救護、消防）</a>
+    <button class="big" data-share>分享我的位置</button>
+    <button class="big" id="smsBtn">傳簡訊給緊急聯絡人</button>
+    <button class="big" data-card="0">顯示「我需要幫助」字卡</button>
+    <a class="big" href="tel:+34915717834" style="background:var(--ink);color:var(--bg)">台北駐西班牙代表處</a>
+    <button class="big close" id="sosClose">關閉</button>
+  </div>
+</div>
+
+<div class="sheet" id="wcSheet" role="dialog" aria-modal="true" aria-label="找廁所">
+  <div class="box">
+    <h2>找廁所</h2>
+    <p class="hint" style="margin:-4px 0 4px">西班牙公廁很少。咖啡廳點一杯咖啡就能借；百貨和購物中心通常免費。</p>
+    <a class="big" data-wcq="cafeteria" target="_blank" rel="noopener">附近咖啡廳</a>
+    <a class="big" data-wcq="El Corte Inglés" target="_blank" rel="noopener">附近百貨公司（El Corte Inglés）</a>
+    <a class="big" data-wcq="centro comercial" target="_blank" rel="noopener">附近購物中心</a>
+    <a class="big" data-wcq="McDonald's" target="_blank" rel="noopener">附近速食店</a>
+    <button class="big" data-card="8" style="background:var(--olive)">顯示「借廁所」字卡</button>
+    <button class="big close" id="wcClose">關閉</button>
+  </div>
+</div>
+
+<div class="card-full" id="cardFull" role="dialog" aria-modal="true">
+  <button class="x" id="cardX">關閉</button>
+  <div class="es" id="cardEs"></div>
+  <div class="zh" id="cardZh"></div>
+  <button class="speak" id="cardSay">朗讀</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- data ---------- */
+// zones: r=radius(m), day/night level 0-3
+const CITIES = {
+  "巴塞隆納":{c:[41.3870,2.1700],
+    zones:[
+      {n:"蘭布拉大道 La Rambla",p:[41.3809,2.1735],r:450,day:3,night:3,tip:"全西班牙扒手最多的地方，含加泰隆尼亞廣場和 L3 地鐵。"},
+      {n:"El Raval",p:[41.3797,2.1680],r:400,day:1,night:2,tip:"白天可以逛，晚上別鑽小巷。"},
+      {n:"Barceloneta 海灘",p:[41.3784,2.1925],r:600,day:2,night:2,tip:"下水時包包常被拿走，貴重物品別帶去海灘。"},
+      {n:"聖家堂周邊",p:[41.4030,2.1740],r:220,day:1,night:1,tip:"排隊人群裡有扒手。"},
+      {n:"哥德區小巷",p:[41.3830,2.1770],r:350,day:1,night:2,tip:"巷子窄、人多，晚上走大路。"}],
+    places:[
+      {t:"sight",n:"聖家堂",d:"必須預約時段票。",p:[41.4036,2.1744]},
+      {t:"sight",n:"奎爾公園",d:"紀念區要買票，早上第一場最舒服。",p:[41.4145,2.1527]},
+      {t:"sight",n:"巴特略之家",d:"高第作品。",p:[41.3916,2.1649]},
+      {t:"sight",n:"米拉之家",d:"屋頂煙囪群，有夜間場。",p:[41.3953,2.1620]},
+      {t:"sight",n:"巴塞隆納大教堂",d:"哥德區中心。",p:[41.3840,2.1762]},
+      {t:"sight",n:"蒙特惠克城堡",d:"俯瞰港口。",p:[41.3634,2.1663]},
+      {t:"food",n:"波格利亞市場",d:"往裡面走比較便宜。",p:[41.3818,2.1716]},
+      {t:"food",n:"El Xampanyet",d:"cava 酒吧，鯷魚必點。",p:[41.3843,2.1817]},
+      {t:"food",n:"Cervecería Catalana",d:"人氣 tapas，要排隊。",p:[41.3929,2.1617]},
+      {t:"food",n:"Can Solé",d:"海港區老牌海鮮飯。",p:[41.3793,2.1898]}]},
+  "馬德里":{c:[40.4169,-3.7035],
+    zones:[
+      {n:"太陽門 / 格蘭大道",p:[40.4180,-3.7045],r:420,day:2,night:2,tip:"扒手密集，Sol 地鐵站轉乘通道尤其多。"},
+      {n:"El Rastro 跳蚤市場",p:[40.4087,-3.7076],r:300,day:2,night:0,tip:"週日上午人擠人，包包背胸前。"},
+      {n:"Lavapiés",p:[40.4087,-3.7010],r:400,day:0,night:1,tip:"白天熱鬧，深夜偶有搶奪。"},
+      {n:"主廣場",p:[40.4155,-3.7074],r:150,day:1,night:1,tip:"露天座位放手機容易被拿。"}],
+    places:[
+      {t:"sight",n:"主廣場",d:"17 世紀拱廊廣場。",p:[40.4155,-3.7074]},
+      {t:"sight",n:"馬德里王宮",d:"早上人少。",p:[40.4180,-3.7143]},
+      {t:"sight",n:"普拉多美術館",d:"傍晚最後兩小時免費。",p:[40.4138,-3.6921]},
+      {t:"sight",n:"雷蒂羅公園",d:"水晶宮與划船湖。",p:[40.4153,-3.6845]},
+      {t:"sight",n:"德波神廟",d:"看夕陽首選。",p:[40.4240,-3.7178]},
+      {t:"food",n:"聖米格爾市場",d:"tapas 市場，一次吃多樣。",p:[40.4154,-3.7090]},
+      {t:"food",n:"San Ginés 吉拿棒",d:"1894 年老店。",p:[40.4168,-3.7069]},
+      {t:"food",n:"Sobrino de Botín",d:"最古老餐廳，烤乳豬，需訂位。",p:[40.4141,-3.7080]},
+      {t:"food",n:"El Brillante",d:"炸魷魚三明治。",p:[40.4087,-3.6927]}]},
+  "塞維亞":{c:[37.3891,-5.9845],
+    zones:[
+      {n:"大教堂周邊",p:[37.3866,-5.9930],r:250,day:2,night:1,tip:"迷迭香詐騙集中地，不接、不停。"},
+      {n:"Polígono Sur",p:[37.3600,-5.9640],r:1200,day:3,night:3,tip:"治安最差的社區之一，觀光客不需要來。"},
+      {n:"Alameda de Hércules",p:[37.3990,-5.9935],r:250,day:0,night:1,tip:"夜生活區，深夜注意隨身物品。"}],
+    places:[
+      {t:"sight",n:"塞維亞大教堂",d:"登希拉達塔是斜坡。",p:[37.3861,-5.9926]},
+      {t:"sight",n:"塞維亞王宮",d:"務必提前訂票。",p:[37.3831,-5.9902]},
+      {t:"sight",n:"西班牙廣場",d:"彩磁磚長椅。",p:[37.3772,-5.9869]},
+      {t:"sight",n:"都市陽傘 Las Setas",d:"頂部步道夜景好。",p:[37.3933,-5.9918]},
+      {t:"food",n:"El Rinconcillo",d:"1670 年老酒館。",p:[37.3941,-5.9886]},
+      {t:"food",n:"Bodega Santa Cruz",d:"便宜道地 tapas。",p:[37.3856,-5.9907]},
+      {t:"food",n:"Eslava",d:"得獎創意 tapas。",p:[37.3995,-5.9963]}]},
+  "格拉納達":{c:[37.1765,-3.5990],
+    zones:[
+      {n:"聖尼可拉斯觀景台",p:[37.1812,-3.5928],r:150,day:2,night:1,tip:"日落人潮擠，扒手多。"},
+      {n:"阿爾拜辛區小巷",p:[37.1800,-3.5950],r:500,day:0,night:1,tip:"晚上結伴，走主要坡道。"},
+      {n:"大教堂周邊",p:[37.1768,-3.5993],r:200,day:1,night:0,tip:"迷迭香詐騙。"}],
+    places:[
+      {t:"sight",n:"阿爾罕布拉宮",d:"宮殿有指定入場時間，晚到不能進。",p:[37.1761,-3.5881]},
+      {t:"sight",n:"聖尼可拉斯觀景台",d:"看阿罕布拉宮夕陽。",p:[37.1811,-3.5926]},
+      {t:"sight",n:"格拉納達大教堂",d:"旁邊是皇家禮拜堂。",p:[37.1765,-3.5990]},
+      {t:"food",n:"Bodegas Castañeda",d:"點飲料送 tapas。",p:[37.1763,-3.5970]},
+      {t:"food",n:"Los Diamantes",d:"炸海鮮 tapas。",p:[37.1746,-3.5984]}]},
+  "瓦倫西亞":{c:[39.4699,-0.3763],
+    zones:[
+      {n:"中央市場 / 舊城",p:[39.4740,-0.3780],r:300,day:1,night:1,tip:"人潮處小心扒竊。"},
+      {n:"Malvarrosa 海灘",p:[39.4780,-0.3240],r:700,day:2,night:1,tip:"海灘財物失竊常見。"}],
+    places:[
+      {t:"sight",n:"藝術科學城",d:"未來感建築群。",p:[39.4545,-0.3505]},
+      {t:"sight",n:"絲綢交易所",d:"世界遺產。",p:[39.4744,-0.3784]},
+      {t:"sight",n:"圖里亞公園",d:"舊河道公園，適合騎車。",p:[39.4780,-0.3700]},
+      {t:"food",n:"中央市場",d:"週日休。",p:[39.4737,-0.3790]},
+      {t:"food",n:"La Pepica",d:"海灘邊百年海鮮飯。",p:[39.4664,-0.3237]},
+      {t:"food",n:"Horchatería Santa Catalina",d:"油莎豆奶。",p:[39.4752,-0.3767]}]}
+};
+const EXTRA = {
+  "馬德里":{air:"機場→市區：Exprés Aeropuerto 機場快線巴士 24 小時往返 Atocha 車站（夜間停 Cibeles）；或地鐵 8 號線到 Nuevos Ministerios，機場站要另付附加費。T4 航廈另有 Cercanías 近郊火車。",
+    p:[{t:"trans",n:"Atocha 車站",d:"高鐵往塞維亞、瓦倫西亞、格拉納達，也是機場快線終點。",p:[40.4066,-3.6892]},
+       {t:"trans",n:"Chamartín 車站",d:"往北部與部分高鐵班次。",p:[40.4722,-3.6826]},
+       {t:"trans",n:"馬德里機場 MAD",d:"T4 與 T1–T3 分開，搭車前確認航廈。",p:[40.4936,-3.5668]},
+       {t:"wc",n:"El Corte Inglés（Callao）",d:"百貨公司樓上有免費廁所。位置為概略。",p:[40.4192,-3.7058]}]},
+  "巴塞隆納":{air:"機場→市區：Aerobús 直達加泰隆尼亞廣場最簡單；R2 Nord 火車只停 T2 航廈；地鐵 L9 Sud 的機場站要買專用機場票，一般十次票不能用。",
+    p:[{t:"trans",n:"Sants 車站",d:"高鐵往馬德里、瓦倫西亞；R2 Nord 也停這裡。",p:[41.3790,2.1400]},
+       {t:"trans",n:"巴塞隆納機場 BCN",d:"T1 與 T2 相距很遠，有免費接駁巴士。",p:[41.2971,2.0785]},
+       {t:"trans",n:"加泰隆尼亞廣場",d:"Aerobús 終點，地鐵 L1、L3 交會，扒手多。",p:[41.3870,2.1700]},
+       {t:"wc",n:"El Corte Inglés（加泰隆尼亞廣場）",d:"百貨公司樓上有免費廁所。位置為概略。",p:[41.3874,2.1704]}]},
+  "塞維亞":{air:"機場→市區：機場巴士 EA 往返市中心，途經 Santa Justa 車站附近；夏季下午炎熱，計程車是省力選擇。",
+    p:[{t:"trans",n:"Santa Justa 車站",d:"高鐵往馬德里，火車往格拉納達、哥多華。",p:[37.3920,-5.9750]},
+       {t:"trans",n:"Plaza de Armas 巴士站",d:"Alsa 等長途巴士。位置為概略。",p:[37.3910,-6.0020]},
+       {t:"trans",n:"塞維亞機場 SVQ",d:"市區東北方。",p:[37.4180,-5.8931]},
+       {t:"wc",n:"El Corte Inglés（Plaza del Duque）",d:"百貨公司樓上有免費廁所。位置為概略。",p:[37.3946,-5.9958]}]},
+  "格拉納達":{air:"機場→市區：Alsa 機場巴士到市中心與大教堂附近。阿爾罕布拉宮可搭 C30、C32 小巴上山。",
+    p:[{t:"trans",n:"格拉納達火車站",d:"往馬德里、塞維亞方向。",p:[37.1840,-3.6090]},
+       {t:"trans",n:"格拉納達巴士總站",d:"Alsa 長途巴士，往塞維亞、馬拉加常比火車方便。位置為概略。",p:[37.1965,-3.6145]},
+       {t:"trans",n:"格拉納達機場 GRX",d:"市區西方。",p:[37.1887,-3.7774]},
+       {t:"wc",n:"El Corte Inglés（Carrera del Genil）",d:"百貨公司樓上有免費廁所。位置為概略。",p:[37.1718,-3.5978]}]},
+  "瓦倫西亞":{air:"機場→市區：地鐵 3、5 號線直達市中心，機場站票價較高。",
+    p:[{t:"trans",n:"Joaquín Sorolla 車站",d:"高鐵往馬德里。",p:[39.4600,-0.3780]},
+       {t:"trans",n:"Nord 北站",d:"市中心的傳統車站，近郊與區域火車。",p:[39.4664,-0.3773]},
+       {t:"trans",n:"瓦倫西亞機場 VLC",d:"地鐵可達。",p:[39.4893,-0.4816]},
+       {t:"wc",n:"El Corte Inglés（Pintor Sorolla）",d:"百貨公司樓上有免費廁所。位置為概略。",p:[39.4710,-0.3730]}]}
+};
+for(const c in EXTRA){CITIES[c].places.push(...EXTRA[c].p);CITIES[c].air=EXTRA[c].air;}
+const INTERCITY="城際交通：高鐵有 Renfe（AVE / Avlo）、Iryo、Ouigo 三家，越早訂越便宜；長途巴士用 Alsa。叫車用 Cabify 或 FreeNow（可叫正規計程車）。";
+const PHRASES = [
+  ["Necesito ayuda, por favor.","我需要幫助。"],
+  ["Me han robado. ¿Dónde está la comisaría?","我被偷了。請問警察局在哪裡？"],
+  ["Quiero poner una denuncia.","我要報案（保險理賠需要報案證明）。"],
+  ["Por favor, llame a una ambulancia.","請幫我叫救護車。"],
+  ["Me he perdido. ¿Cómo llego a esta dirección?","我迷路了，請問這個地址怎麼走？"],
+  ["No hablo español. ¿Habla inglés?","我不會說西班牙文，你會說英文嗎？"],
+  ["Soy alérgico/a al marisco.","我對海鮮過敏。"],
+  ["¿Dónde está el baño, por favor?","請問廁所在哪裡？"],
+  ["¿Puedo usar el baño? Voy a tomar un café.","我可以借廁所嗎？我會點一杯咖啡。"],
+  ["¿Qué autobús va a esta dirección?","請問哪一班公車到這個地址？"],
+  ["Lléveme a esta dirección, por favor.","請載我到這個地址（給計程車司機看）。"],
+  ["¡Déjeme en paz!","請離我遠一點！"]
+];
+const LV = [["安全","s0"],["留意","s1"],["小心","s2"],["避開","s3"]];
+
+/* ---------- utils ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const rad = d => d*Math.PI/180;
+function dist(a,b){const R=6371000,dl=rad(b[0]-a[0]),dg=rad(b[1]-a[1]);
+  const h=Math.sin(dl/2)**2+Math.cos(rad(a[0]))*Math.cos(rad(b[0]))*Math.sin(dg/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
+const fmt = m => m<1000 ? Math.round(m)+" m" : (m/1000).toFixed(m<10000?1:0)+" km";
+const isNight = () => { const h=new Date().getHours(); return h>=21 || h<6; };
+const zoneLv = z => isNight() ? z.night : z.day;
+const ls = { get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v);}catch(e){return d;}},
+             set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}} };
+function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("on"),2200);}
+const mapsLink = p => `https://www.google.com/maps/search/?api=1&query=${p[0].toFixed(6)},${p[1].toFixed(6)}`;
+
+/* ---------- state ---------- */
+let pos = null, watchId = null, city = Object.keys(CITIES)[0], filter = "all";
+let favs = new Set(ls.get("ss_fav", []));
+function nearestCity(p){let best=null,bd=Infinity;for(const c in CITIES){const d=dist(p,CITIES[c].c);if(d<bd){bd=d;best=c;}}return [best,bd];}
+
+/* ---------- tabs ---------- */
+function go(tab){
+  document.querySelectorAll(".view").forEach(v=>v.classList.toggle("on", v.id==="v-"+tab));
+  document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-selected", b.dataset.tab===tab));
+  window.scrollTo(0,0);
+  if(tab==="explore") renderExplore();
+}
+document.querySelector("nav").addEventListener("click", e=>{const t=e.target.closest("button")?.dataset.tab; if(t) go(t);});
+document.addEventListener("click", e=>{const g=e.target.closest("[data-goto]"); if(g) go(g.dataset.goto);});
+
+/* ---------- status ---------- */
+function renderStatus(){
+  const st=$("#status");
+  if(!pos){return;}
+  const [c,cd]=nearestCity(pos);
+  const near=$("#nearZone");
+  $("#qPolice").href=`https://www.google.com/maps/search/comisaria+policia/@${pos[0]},${pos[1]},15z`;
+  $("#qTaxi").href=`https://www.google.com/maps/search/parada+de+taxi/@${pos[0]},${pos[1]},16z`;
+  $("#qPharm").href=`https://www.google.com/maps/search/farmacia/@${pos[0]},${pos[1]},16z`;
+  const time = isNight() ? "夜間（21:00–06:00）標準" : "白天標準";
+  if(cd>30000){
+    st.className="status sx"; $("#stLv").textContent="不在收錄城市";
+    $("#stWhere").textContent=`離${c}約 ${fmt(cd)}`;
+    $("#stTip").textContent="這裡沒有危險區資料，人多的地方一樣顧好包包。";
+    $("#stSmall").textContent=""; near.textContent=""; return;
+  }
+  if(city!==c){city=c;}
+  let inside=[], closest=null, closestD=Infinity;
+  for(const z of CITIES[c].zones){
+    const d=dist(pos,z.p);
+    if(d<=z.r && zoneLv(z)>0) inside.push(z);
+    else if(zoneLv(z)>0 && d-z.r<closestD){closestD=d-z.r;closest=z;}
+  }
+  inside.sort((a,b)=>zoneLv(b)-zoneLv(a));
+  const top=inside[0], lv=top?zoneLv(top):0;
+  st.className="status "+LV[lv][1];
+  $("#stLv").textContent=LV[lv][0];
+  $("#stWhere").textContent= top ? `你在：${top.n}` : `${c}，附近沒有已知危險區`;
+  $("#stTip").textContent= top ? top.tip : "還是一樣：手機不放桌上、包包拉鍊朝前。";
+  $("#stSmall").textContent=`${time}・定位精度約 ${fmt(pos.acc||0)}`;
+  near.textContent = (!top && closest && closestD<600) ? `前方 ${fmt(closestD)}：${closest.n}（${LV[zoneLv(closest)][0]}）` : "";
+}
+$("#locBtn").addEventListener("click", ()=>{
+  if(!navigator.geolocation){toast("這個瀏覽器不支援定位");return;}
+  if(watchId!==null){navigator.geolocation.clearWatch(watchId);watchId=null;$("#locBtn").textContent="開始定位";return;}
+  $("#stLv").textContent="定位中…";
+  watchId=navigator.geolocation.watchPosition(p=>{
+    pos=[p.coords.latitude,p.coords.longitude]; pos.acc=p.coords.accuracy;
+    $("#locBtn").textContent="停止定位"; renderStatus();
+    if($("#v-explore").classList.contains("on")) renderExplore();
+  }, err=>{
+    $("#stLv").textContent="無法定位";
+    $("#stWhere").textContent= err.code===1 ? "位置權限被拒絕" : "暫時抓不到訊號";
+    $("#stTip").textContent= err.code===1 ? "到 設定 → 隱私權與安全性 → 定位服務 → Safari，改成「使用 App 期間」。" : "移到戶外或靠窗再試一次。";
+    let framed=false; try{framed=window.self!==window.top;}catch(e){framed=true;}
+    if(err.code===1 && framed) $("#stTip").textContent="你是在 App 內嵌視窗開啟的，內嵌視窗不允許定位。請改用 Safari 直接開網址。";
+    else if(err.code===1 && !window.isSecureContext) $("#stTip").textContent="網址不是 https，iPhone 會擋定位。請改用 https 網址開啟。";
+    $("#stSmall").textContent=`診斷：code=${err.code}｜${err.message||"-"}｜https=${window.isSecureContext}｜內嵌=${framed}｜${navigator.userAgent.match(/OS [\d_]+/)?.[0]||""}`;
+    watchId=null; $("#locBtn").textContent="重新定位";
+  }, {enableHighAccuracy:true, maximumAge:15000, timeout:20000});
+});
+setInterval(()=>{ if(pos) renderStatus(); }, 60000); // day/night switch
+
+/* ---------- explore ---------- */
+function renderExplore(){
+  $("#cities").innerHTML=Object.keys(CITIES).map(c=>`<button data-c="${c}" aria-pressed="${c===city}">${c}</button>`).join("");
+  renderMap();
+  const C=CITIES[city];
+  const useMe = pos && dist(pos,C.c)<30000;
+  const base = useMe ? pos : C.c;
+  $("#air").innerHTML=`<b>${esc(city)}交通</b>${esc(C.air||"")}<br><span style="color:var(--muted)">${esc(INTERCITY)}</span>`;
+  $("#baseHint").textContent = useMe ? "依你目前位置排序" : "依市中心距離排序";
+  let rows = [
+    ...C.zones.map(z=>({t:"danger",n:z.n,d:z.tip,p:z.p,z})),
+    ...C.places
+  ].map(x=>({...x,m:dist(base,x.p)}));
+  if(filter==="fav") rows=rows.filter(x=>favs.has(city+"|"+x.n));
+  else if(filter!=="all") rows=rows.filter(x=>x.t===filter);
+  rows.sort((a,b)=>a.m-b.m);
+  if(!rows.length){$("#list").innerHTML=`<p class="hint">${filter==="fav"?"還沒有收藏，點地點下方的「收藏」加入。":"沒有資料。"}</p>`;return;}
+  $("#list").innerHTML=rows.map(x=>{
+    const k=city+"|"+x.n, f=favs.has(k);
+    const badge = x.z ? `<span class="badge ${LV[zoneLv(x.z)][1]}">${isNight()?"夜間":"白天"}${LV[zoneLv(x.z)][0]}</span>` : "";
+    return `<article class="item ${x.t}"><h3>${esc(x.n)}${badge}</h3><div class="meta">${fmt(x.m)}</div>
+      <p>${esc(x.d)}</p><div class="acts"><a href="${mapsLink(x.p)}" target="_blank" rel="noopener">導航</a>
+      <button data-fav="${esc(k)}">${f?"★ 已收藏":"☆ 收藏"}</button></div></article>`;
+  }).join("");
+}
+/* ---------- map (local projection in metres around city centre) ---------- */
+let view={x:0,y:0,w:3200}, viewCity=null, picked=null;
+function proj(p){const c=CITIES[city].c;return [(p[1]-c[1])*111320*Math.cos(rad(c[0])), -(p[0]-c[0])*110540];}
+function resetView(){
+  const C=CITIES[city];
+  if(pos && dist(pos,C.c)<30000){const [x,y]=proj(pos);view={x,y,w:1600};}
+  else view={x:0,y:0,w:3600};
+  viewCity=city;
+}
+function renderMap(){
+  if(viewCity!==city){resetView();picked=null;$("#pick").classList.remove("on");}
+  const svg=$("#map"), C=CITIES[city], w=view.w, x0=view.x-w/2, y0=view.y-w/2;
+  svg.setAttribute("viewBox",`${x0} ${y0} ${w} ${w}`);
+  const step=[100,200,500,1000,2000,5000].find(s=>w/s<=10)||5000;
+  let g="";
+  for(let gx=Math.ceil(x0/step)*step; gx<x0+w; gx+=step) g+=`<line x1="${gx}" y1="${y0}" x2="${gx}" y2="${y0+w}"/>`;
+  for(let gy=Math.ceil(y0/step)*step; gy<y0+w; gy+=step) g+=`<line x1="${x0}" y1="${gy}" x2="${x0+w}" y2="${gy}"/>`;
+  const u=w/400, showLbl=w<=4500;
+  const zones=C.zones.map((z,i)=>{const [x,y]=proj(z.p),lv=zoneLv(z);
+    const op=[0.06,0.14,0.24,0.34][lv];
+    return `<g data-pick="z${i}"><circle cx="${x}" cy="${y}" r="${z.r}" fill="var(--red)" fill-opacity="${op}" stroke="var(--red)" stroke-width="${u*1.5}" stroke-dasharray="${lv?0:u*5}"/>
+      ${showLbl?`<text x="${x}" y="${y}" font-size="${u*11}" text-anchor="middle" fill="var(--red)" font-weight="700">${esc(z.n)}</text>`:""}</g>`;}).join("");
+  const places=C.places.map((p,i)=>{const [x,y]=proj(p.p),col={food:"var(--saffron)",sight:"var(--cobalt)",trans:"var(--olive)",wc:"var(--muted)"}[p.t];
+    return `<g data-pick="p${i}"><circle cx="${x}" cy="${y}" r="${u*12}" fill="transparent"/><circle cx="${x}" cy="${y}" r="${u*6}" fill="${col}" stroke="var(--card)" stroke-width="${u*2}"/>
+      ${showLbl?`<text x="${x+u*9}" y="${y+u*4}" font-size="${u*10.5}" fill="var(--ink)">${esc(p.n)}</text>`:""}</g>`;}).join("");
+  let me="";
+  if(pos && dist(pos,C.c)<30000){const [x,y]=proj(pos);
+    me=`<circle cx="${x}" cy="${y}" r="${Math.max(pos.acc||0,u*10)}" fill="var(--cobalt)" fill-opacity=".12"/>
+        <circle cx="${x}" cy="${y}" r="${u*7}" fill="var(--cobalt)" stroke="#fff" stroke-width="${u*2.5}"/>`;}
+  svg.innerHTML=`<rect x="${x0}" y="${y0}" width="${w}" height="${w}" fill="var(--card)"/>
+    <g stroke="var(--line)" stroke-width="${u}">${g}</g>${zones}${places}${me}
+    <text x="${x0+u*12}" y="${y0+u*20}" font-size="${u*13}" font-weight="700" fill="var(--muted)">N ↑</text>`;
+  const px=$("#map").getBoundingClientRect().width||360, bar=step;
+  $("#scale").innerHTML=`<div style="width:${(bar/w*px).toFixed(0)}px"></div>${fmt(bar)}`;
+}
+function showPick(key){
+  const C=CITIES[city], z=key[0]==="z", it=z?C.zones[+key.slice(1)]:C.places[+key.slice(1)];
+  if(!it) return;
+  const d=pos?`距離你 ${fmt(dist(pos,it.p))}・`:"";
+  const lv=z?`<span class="badge ${LV[zoneLv(it)][1]}">${isNight()?"夜間":"白天"}${LV[zoneLv(it)][0]}</span>`:"";
+  const q=encodeURIComponent(it.n);
+  $("#pick").innerHTML=`<h3>${esc(it.n)}${lv}</h3><p>${d}${esc(z?it.tip:it.d)}</p>
+    ${z?"":`<div class="row"><a class="btn" href="https://maps.apple.com/?daddr=${it.p[0]},${it.p[1]}&q=${q}&dirflg=w" target="_blank" rel="noopener">Apple 地圖導航</a>
+    <a class="btn ghost" href="https://www.google.com/maps/dir/?api=1&destination=${it.p[0]},${it.p[1]}&travelmode=walking" target="_blank" rel="noopener">Google 導航</a></div>`}`;
+  $("#pick").classList.add("on");
+}
+(function mapGestures(){
+  const svg=$("#map"), pts=new Map(); let moved=0, start=null;
+  const scaleOf=()=>view.w/(svg.getBoundingClientRect().width||1);
+  svg.addEventListener("pointerdown",e=>{svg.setPointerCapture(e.pointerId);pts.set(e.pointerId,{x:e.clientX,y:e.clientY});moved=0;
+    if(pts.size===2){const [a,b]=[...pts.values()];start={d:Math.hypot(a.x-b.x,a.y-b.y),w:view.w};}});
+  svg.addEventListener("pointermove",e=>{if(!pts.has(e.pointerId))return;const prev=pts.get(e.pointerId);
+    const cur={x:e.clientX,y:e.clientY};pts.set(e.pointerId,cur);
+    if(pts.size===1){const s=scaleOf();view.x-=(cur.x-prev.x)*s;view.y-=(cur.y-prev.y)*s;moved+=Math.abs(cur.x-prev.x)+Math.abs(cur.y-prev.y);renderMap();}
+    else if(pts.size===2&&start){const [a,b]=[...pts.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);
+      view.w=Math.min(20000,Math.max(300,start.w*start.d/d));moved=99;renderMap();}});
+  const up=e=>{pts.delete(e.pointerId);if(pts.size<2)start=null;
+    if(e.type==="pointerup"&&moved<6){const t=document.elementFromPoint(e.clientX,e.clientY)?.closest("[data-pick]");if(t)showPick(t.dataset.pick);}};
+  svg.addEventListener("pointerup",up);svg.addEventListener("pointercancel",up);
+  svg.addEventListener("wheel",e=>{e.preventDefault();view.w=Math.min(20000,Math.max(300,view.w*(e.deltaY>0?1.15:0.87)));renderMap();},{passive:false});
+  $("#zIn").onclick=()=>{view.w=Math.max(300,view.w/1.5);renderMap();};
+  $("#zOut").onclick=()=>{view.w=Math.min(20000,view.w*1.5);renderMap();};
+  $("#zMe").onclick=()=>{if(pos&&dist(pos,CITIES[city].c)<30000){const [x,y]=proj(pos);view.x=x;view.y=y;renderMap();}
+    else if(pos){const [c]=nearestCity(pos);if(dist(pos,CITIES[c].c)<30000){city=c;viewCity=null;renderExplore();}else toast("你不在收錄城市內");}
+    else toast("先到「現在」開始定位");};
+})();
+$("#cities").addEventListener("click",e=>{const c=e.target.closest("button")?.dataset.c;if(c){city=c;renderExplore();}});
+$("#filters").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;filter=b.dataset.f;
+  document.querySelectorAll("#filters button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderExplore();});
+$("#list").addEventListener("click",e=>{const k=e.target.closest("[data-fav]")?.dataset.fav;if(!k)return;
+  favs.has(k)?favs.delete(k):favs.add(k);ls.set("ss_fav",[...favs]);renderExplore();});
+
+/* ---------- phrases ---------- */
+function speak(text, lang){
+  if(!("speechSynthesis" in window)){toast("此瀏覽器不支援朗讀");return;}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text); u.lang=lang; u.rate=0.9;
+  const v=speechSynthesis.getVoices().find(v=>v.lang.replace("_","-").startsWith(lang));
+  if(v) u.voice=v;
+  speechSynthesis.speak(u);
+}
+let cardLang="es-ES";
+function showCard(big, small, lang){
+  $("#cardEs").textContent=big; $("#cardZh").textContent=small; cardLang=lang;
+  $("#sosSheet").classList.remove("on"); $("#wcSheet").classList.remove("on"); $("#cardFull").classList.add("on");
+}
+$("#phrases").innerHTML=PHRASES.map((p,i)=>`<button data-card="${i}"><span class="say">點開放大</span><b>${esc(p[1])}</b><span>${esc(p[0])}</span></button>`).join("");
+document.addEventListener("click",e=>{const c=e.target.closest("[data-card]");if(!c)return;const p=PHRASES[+c.dataset.card];showCard(p[0],p[1],"es-ES");});
+$("#cardX").addEventListener("click",()=>{$("#cardFull").classList.remove("on");if("speechSynthesis" in window)speechSynthesis.cancel();});
+$("#cardSay").addEventListener("click",()=>speak($("#cardEs").textContent,cardLang));
+
+/* ---------- translate ---------- */
+let trDir="zh2es", sampleFn=null, trCtl=null;
+const TR = {
+  zh2es:{from:"zh-TW",to:"es",say:"es-ES",ph:"輸入或按鍵盤上的麥克風用說的",
+    prompt:t=>`把下面的台灣繁體中文翻成西班牙本地（castellano，非拉丁美洲）的自然口語西班牙文。這是旅客要拿手機給當地人看的句子，語氣禮貌。只輸出譯文本身，不要引號、注音、說明。\n\n${t}`},
+  es2zh:{from:"es",to:"zh-TW",say:"zh-TW",ph:"貼上或輸入西班牙文（菜單、標示、對方打的字）",
+    prompt:t=>`把下面的西班牙文翻成台灣繁體中文。只輸出譯文；如果是菜名或當地特有名詞，在譯文後用括號補一句很短的說明。不要其他文字。\n\n${t}`}
+};
+function trSync(){
+  const c=TR[trDir], t=$("#trIn").value.trim();
+  $("#trIn").placeholder=c.ph;
+  $("#trG").href=`https://translate.google.com/?sl=${c.from}&tl=${c.to}&op=translate${t?"&text="+encodeURIComponent(t):""}`;
+  $("#trGo").style.display = sampleFn ? "" : "none";
+  $("#trNote").textContent = sampleFn ? "內建翻譯會使用你自己的 Claude 額度，第一次會詢問是否允許。" :
+    "內建翻譯只在 Claude App 裡開啟時可用；現在請用 Google 翻譯，或下方的離線字卡。";
+}
+$("#dir").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;trDir=b.dataset.d;
+  document.querySelectorAll("#dir button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  $("#trOut").textContent="";$("#trActs").style.display="none";trSync();});
+$("#trIn").addEventListener("input",trSync);
+$("#trGo").addEventListener("click",async()=>{
+  const t=$("#trIn").value.trim(); if(!t){$("#trIn").focus();return;}
+  if(!sampleFn) return;
+  if(trCtl){trCtl.abort();}
+  trCtl=new AbortController();
+  const out=$("#trOut"), btn=$("#trGo");
+  out.textContent="翻譯中…"; btn.disabled=true; $("#trActs").style.display="none";
+  try{
+    await sampleFn(TR[trDir].prompt(t),{modelTier:"quick",signal:trCtl.signal,onText:({text})=>{out.textContent=text;}});
+    $("#trActs").style.display="";
+  }catch(e){
+    out.textContent=e.text||"";
+    if(e.code==="not_granted"){sampleFn=null;trSync();toast("未允許內建翻譯，改用 Google 翻譯");}
+    else if(e.code==="rate_limited") toast("太頻繁了，稍等一下再試");
+    else if(e.code!=="cancelled") toast("翻譯失敗，請改用 Google 翻譯");
+  }finally{btn.disabled=false;trCtl=null;}
+});
+$("#trSay").addEventListener("click",()=>speak($("#trOut").textContent,TR[trDir].say));
+$("#trFull").addEventListener("click",()=>showCard($("#trOut").textContent,$("#trIn").value.trim(),TR[trDir].say));
+trSync();
+if(window.claude && typeof window.claude.use==="function"){
+  window.claude.use("sample").then(s=>{sampleFn=s||null;trSync();}).catch(()=>{});
+}
+
+/* ---------- SOS / share ---------- */
+$("#sosBtn").addEventListener("click",()=>$("#sosSheet").classList.add("on"));
+$("#qWc").addEventListener("click",()=>{
+  document.querySelectorAll("[data-wcq]").forEach(a=>{
+    const q=encodeURIComponent(a.dataset.wcq);
+    a.href = pos ? `https://www.google.com/maps/search/${q}/@${pos[0]},${pos[1]},16z` : `https://www.google.com/maps/search/${q}`;
+  });
+  $("#wcSheet").classList.add("on");
+});
+$("#wcClose").addEventListener("click",()=>$("#wcSheet").classList.remove("on"));
+$("#wcSheet").addEventListener("click",e=>{if(e.target.id==="wcSheet"||e.target.closest("[data-wcq]"))e.currentTarget.classList.remove("on");});
+$("#sosClose").addEventListener("click",()=>$("#sosSheet").classList.remove("on"));
+$("#sosSheet").addEventListener("click",e=>{if(e.target.id==="sosSheet")e.currentTarget.classList.remove("on");});
+function getOnce(){return new Promise(res=>{
+  if(pos) return res(pos);
+  if(!navigator.geolocation) return res(null);
+  navigator.geolocation.getCurrentPosition(p=>{pos=[p.coords.latitude,p.coords.longitude];pos.acc=p.coords.accuracy;renderStatus();res(pos);},()=>res(null),{enableHighAccuracy:true,timeout:12000,maximumAge:30000});
+});}
+const msgText = p => p ? `我在這裡，需要協助：${mapsLink(p)}` : "我需要協助，暫時抓不到定位。";
+document.addEventListener("click",async e=>{
+  if(!e.target.closest("[data-share]")) return;
+  const p=await getOnce(), text=msgText(p);
+  if(navigator.share){try{await navigator.share({text});return;}catch(err){if(err.name==="AbortError")return;}}
+  try{await navigator.clipboard.writeText(text);toast("位置連結已複製，貼到 LINE 傳出");}catch(err){toast(text);}
+});
+$("#smsBtn").addEventListener("click",async()=>{
+  const num=ls.get("ss_ec","");
+  if(!num){toast("先到「我的」設定緊急聯絡人");$("#sosSheet").classList.remove("on");go("me");$("#ecPhone").focus();return;}
+  const p=await getOnce();
+  location.href=`sms:${num.replace(/[^\d+]/g,"")}&body=${encodeURIComponent(msgText(p))}`;
+});
+$("#ecPhone").value=ls.get("ss_ec","");
+$("#ecSave").addEventListener("click",()=>{ls.set("ss_ec",$("#ecPhone").value.trim());toast("已儲存緊急聯絡人");});
+
+/* ---------- vault (IndexedDB + AES-GCM) ---------- */
+const DBN="ss_vault";
+function db(){return new Promise((res,rej)=>{const r=indexedDB.open(DBN,1);
+  r.onupgradeneeded=()=>{r.result.createObjectStore("meta");r.result.createObjectStore("docs",{keyPath:"id"});};
+  r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+async function tx(store,mode,fn){const d=await db();return new Promise((res,rej)=>{const t=d.transaction(store,mode);const s=t.objectStore(store);
+  const out=fn(s);t.oncomplete=()=>res(out&&out.result!==undefined?out.result:out);t.onerror=()=>rej(t.error);});}
+const enc=new TextEncoder();
+async function deriveKey(pin,salt){const base=await crypto.subtle.importKey("raw",enc.encode(pin),"PBKDF2",false,["deriveKey"]);
+  return crypto.subtle.deriveKey({name:"PBKDF2",salt,iterations:250000,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"]);}
+let vkey=null, urls=[];
+async function shrink(file){
+  try{const bmp=await createImageBitmap(file);const s=Math.min(1,1800/Math.max(bmp.width,bmp.height));
+    const cv=document.createElement("canvas");cv.width=Math.round(bmp.width*s);cv.height=Math.round(bmp.height*s);
+    cv.getContext("2d").drawImage(bmp,0,0,cv.width,cv.height);
+    return await new Promise(r=>cv.toBlob(b=>r(b||file),"image/jpeg",0.85));}catch(e){return file;}
+}
+async function renderVault(){
+  const v=$("#vault"); urls.forEach(URL.revokeObjectURL); urls=[];
+  let meta=null; try{meta=await tx("meta","readonly",s=>s.get("m"));}catch(e){v.innerHTML=`<p class="hint">此瀏覽器無法使用本機資料庫。</p>`;return;}
+  if(!meta){
+    v.innerHTML=`<div class="row"><input id="pin1" type="password" inputmode="numeric" maxlength="12" placeholder="設定 4–12 位數 PIN"><button class="btn" id="pinSet">建立</button></div>`;
+    $("#pinSet").onclick=async()=>{const pin=$("#pin1").value;if(!/^\d{4,12}$/.test(pin)){toast("PIN 請用 4–12 位數字");return;}
+      const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
+      vkey=await deriveKey(pin,salt);const chk=await crypto.subtle.encrypt({name:"AES-GCM",iv},vkey,enc.encode("ok"));
+      await tx("meta","readwrite",s=>s.put({salt,iv,chk},"m"));toast("已建立");renderVault();};
+    return;
+  }
+  if(!vkey){
+    v.innerHTML=`<div class="row"><input id="pin2" type="password" inputmode="numeric" maxlength="12" placeholder="輸入 PIN 解鎖"><button class="btn" id="pinGo">解鎖</button></div>`;
+    $("#pinGo").onclick=async()=>{try{const k=await deriveKey($("#pin2").value,meta.salt);
+      await crypto.subtle.decrypt({name:"AES-GCM",iv:meta.iv},k,meta.chk);vkey=k;renderVault();}catch(e){toast("PIN 錯誤");}};
+    return;
+  }
+  const docs=await tx("docs","readonly",s=>s.getAll())||[];
+  const cards=[];
+  for(const d of docs){try{const buf=await crypto.subtle.decrypt({name:"AES-GCM",iv:d.iv},vkey,d.data);
+    const u=URL.createObjectURL(new Blob([buf],{type:"image/jpeg"}));urls.push(u);
+    cards.push(`<div class="doc"><img src="${u}" alt="${esc(d.name)}"><div class="cap"><span>${esc(d.name)}</span><button data-del="${d.id}">刪除</button></div></div>`);}catch(e){}}
+  v.innerHTML=`<div class="row"><input id="docName" placeholder="名稱，例如：護照首頁"><label class="btn" style="cursor:pointer">加入照片<input id="docFile" type="file" accept="image/*" hidden></label></div>
+    <div class="docs">${cards.join("")||`<p class="hint" style="grid-column:1/-1">建議放：護照首頁、簽證或 ETIAS、旅遊保險單、訂房確認、信用卡掛失電話。</p>`}</div>
+    <div class="row" style="margin-top:12px"><button class="btn ghost" id="lock">上鎖</button><button class="btn warn" id="wipe">全部清除</button></div>`;
+  $("#docFile").onchange=async e=>{const f=e.target.files[0];if(!f)return;toast("加密中…");
+    const blob=await shrink(f),iv=crypto.getRandomValues(new Uint8Array(12));
+    const data=await crypto.subtle.encrypt({name:"AES-GCM",iv},vkey,await blob.arrayBuffer());
+    await tx("docs","readwrite",s=>s.put({id:Date.now()+"",name:$("#docName").value.trim()||"證件",iv,data}));toast("已加密儲存");renderVault();};
+  v.querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{if(!confirm("刪除這張？"))return;await tx("docs","readwrite",s=>s.delete(b.dataset.del));renderVault();});
+  $("#lock").onclick=()=>{vkey=null;renderVault();};
+  $("#wipe").onclick=async()=>{if(!confirm("清除所有證件和 PIN？無法復原。"))return;
+    await tx("docs","readwrite",s=>s.clear());await tx("meta","readwrite",s=>s.clear());vkey=null;renderVault();};
+}
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&vkey){vkey=null;renderVault();}}); // auto-lock
+renderVault();
+</script>
+</body>
+</html>
