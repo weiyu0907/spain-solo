@@ -856,11 +856,12 @@ nav button[aria-selected="true"]{color:var(--ink);font-weight:700}
         <button id="zIn" aria-label="放大">+</button>
         <button id="zOut" aria-label="縮小">−</button>
         <button id="zMe" aria-label="回到我的位置">◎</button>
+        <button id="zG" aria-label="在 Google 地圖打開這一區" style="font-size:15px;color:#1A73E8">G↗</button>
       </div>
       <div class="scale" id="scale"></div>
     </div>
     <div class="pick" id="pick"></div>
-    <p class="hint" id="mapHint">紅圈是危險區範圍（依目前時段深淺）。點地點可以導航。</p>
+    <p class="hint" id="mapHint">紅圈是危險區範圍（依目前時段深淺）。點地點可以導航；按 G↗ 用 Google 地圖查這一區的店家和轉乘。</p>
     <div class="chips" id="filters">
       <button data-f="all" aria-pressed="true">全部</button>
       <button data-f="danger" aria-pressed="false">危險區</button>
@@ -1335,6 +1336,14 @@ function showPick(key){
     else if(pos){const [c]=nearestCity(pos);if(dist(pos,CITIES[c].c)<30000){city=c;viewCity=null;renderExplore();}else toast("你不在收錄城市內");}
     else toast("先到「現在」開始定位");};
 })();
+$("#zG").addEventListener("click",()=>{
+  let lat,lng,z;
+  if(LM&&$("#mapwrap").classList.contains("leaf")){const c=LM.getCenter();lat=c.lat;lng=c.lng;z=LM.getZoom();}
+  else{const c=CITIES[city].c;lat=c[0]-view.y/110540;lng=c[1]+view.x/(111320*Math.cos(rad(c[0])));
+    const px=$("#map").getBoundingClientRect().width||360;z=Math.round(Math.log2(156543*Math.cos(rad(lat))*px/view.w));}
+  z=Math.max(3,Math.min(20,Math.round(z)));
+  window.open(`https://www.google.com/maps/@${lat.toFixed(6)},${lng.toFixed(6)},${z}z`,"_blank","noopener");
+});
 $("#cities").addEventListener("click",e=>{const c=e.target.closest("button")?.dataset.c;if(c){city=c;renderExplore();}});
 $("#filters").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;filter=b.dataset.f;
   document.querySelectorAll("#filters button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderExplore();});
