@@ -6,6 +6,9 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="西班牙獨旅">
+<meta name="theme-color" content="#1E3F99">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <title>西班牙獨旅</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -808,6 +811,65 @@ nav button[aria-selected="true"]{color:var(--ink);font-weight:700}
 .card-full .es{font-size:clamp(34px,10vw,56px);font-weight:900;line-height:1.2}
 .card-full .zh{font-size:18px;color:#5B6478;margin-top:18px}
 .card-full .x{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:16px;border:0;background:#E7ECF8;border-radius:999px;padding:8px 14px;font-weight:700;color:#14213D}
+/* sheets scroll on small phones */
+.sheet .box{max-height:88vh;overflow-y:auto}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.opts a{display:flex;flex-direction:column;justify-content:center;min-height:64px;padding:10px 12px;border-radius:14px;background:var(--cobalt-soft);color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;line-height:1.3}
+.opts a span{font-weight:400;font-size:12.5px;color:var(--muted);margin-top:2px}
+/* offline banner */
+.offbar{display:none;background:var(--ink);color:var(--bg);border-radius:14px;padding:10px 14px;font-size:14px;margin-bottom:10px}
+.offbar b{color:var(--saffron)}
+/* stay card */
+.stay{background:#14213D;color:#fff;border-radius:20px;padding:16px;margin-top:14px;display:flex;flex-direction:column;gap:10px}
+.stay .tag{font-size:13px;font-weight:700;letter-spacing:.04em;color:#F2BE3C}
+.stay .nm{font-size:19px;font-weight:700;line-height:1.3}
+.stay .ad{font-size:14px;color:#C7CEE0}
+.stay .two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stay .two a,.stay .two button{display:flex;align-items:center;justify-content:center;height:48px;border-radius:12px;font:inherit;font-size:16px;font-weight:700;text-decoration:none;box-sizing:border-box}
+.stay .go{background:#F2BE3C;color:#14213D;border:0}
+.stay .drv{background:transparent;color:#fff;border:1.5px solid #fff}
+.stay .ed{margin-left:auto;background:transparent;border:1.5px solid #3A4A70;color:#fff;border-radius:8px;padding:4px 10px;font-size:13px}
+.stay.empty{background:var(--card);color:var(--ink);border:1.5px dashed var(--line)}
+.stays{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.stays .it{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px}
+.stays .it.now{border:2px solid var(--cobalt)}
+.stays .it div{flex:1;min-width:0}
+.stays .it small{display:block;color:var(--muted);font-size:13px}
+.stays .it button{background:none;border:0;font-weight:700;color:var(--cobalt);padding:6px}
+.stays .it button.del{color:var(--red)}
+.form{display:flex;flex-direction:column;gap:6px}
+.form label{font-size:13px;color:var(--muted);margin-top:4px}
+.form input{border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:10px;font-size:16px;min-width:0}
+.form .two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.form .two div{display:flex;flex-direction:column;gap:6px}
+/* driver card */
+.card-full .meta2{font-size:clamp(22px,6vw,30px);font-weight:700;margin-top:18px;line-height:1.3}
+.card-full .addr{font-size:clamp(26px,8vw,40px);font-weight:900;margin-top:8px;line-height:1.25;word-break:break-word}
+.card-full .tel{font-size:18px;color:#5B6478;margin-top:10px}
+.card-full .row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:28px}
+.card-full .row2 a,.card-full .row2 button{display:flex;align-items:center;justify-content:center;height:52px;border-radius:14px;font-weight:700;font-size:16px;text-decoration:none;border:1.5px solid #1E3F99;background:#fff;color:#1E3F99}
+.card-full .row2 .pri{background:#1E3F99;color:#fff}
+/* onboarding overlays */
+.ob{position:fixed;inset:0;z-index:70;background:var(--bg);display:none;overflow-y:auto;
+  padding:calc(28px + env(safe-area-inset-top,0px)) 20px calc(24px + env(safe-area-inset-bottom,0px))}
+.ob.on{display:block}
+.ob .in{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:14px;min-height:100%}
+.ob h1{margin:0}
+.ob p{margin:0}
+.ob .bar{height:8px;border-radius:999px;background:var(--line);overflow:hidden}
+.ob .bar i{display:block;height:8px;background:var(--olive);width:0}
+.step{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.step.cur{border:2px solid var(--cobalt)}
+.step .hd{display:flex;align-items:center;gap:12px;font-weight:700;font-size:16px}
+.step .n{width:32px;height:32px;border-radius:50%;border:2px solid var(--muted);display:flex;align-items:center;justify-content:center;font-weight:700;flex:none;box-sizing:border-box;color:var(--muted)}
+.step.cur .n{background:var(--cobalt);border-color:var(--cobalt);color:#fff}
+.step.ok .n{background:var(--olive);border-color:var(--olive);color:#fff}
+.step.ok .hd span{color:var(--muted);text-decoration:line-through}
+.step .bd{font-size:14.5px;line-height:1.6;color:var(--muted)}
+.ob .warn{width:72px;height:72px;border-radius:20px;background:var(--saffron-soft);display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:900;color:var(--saffron)}
+.ob ol{margin:0;padding:16px 16px 16px 38px;background:var(--card);border:1.5px solid var(--line);border-radius:16px;line-height:1.7}
+.ob .link{background:none;border:0;color:var(--cobalt);font-weight:700;padding:10px;font-size:15px}
+.ob .sub{color:var(--muted);text-align:center;font-size:14px}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tabh) + 100px + env(safe-area-inset-bottom,0px));
   background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;z-index:60;display:none}
 .toast.on{display:block}
@@ -815,6 +877,7 @@ nav button[aria-selected="true"]{color:var(--ink);font-weight:700}
 </head>
 <body>
 <main>
+  <div class="offbar" id="offbar"><b>離線中</b>・危險區判斷、字卡、證件、住宿地址卡、看過的地圖都還能用；導航、翻譯、附近搜尋要等有網路。</div>
   <!-- NOW -->
   <section class="view on" id="v-now">
     <h1>現在</h1>
@@ -826,12 +889,13 @@ nav button[aria-selected="true"]{color:var(--ink);font-weight:700}
     </div>
     <button class="big" id="locBtn">開始定位</button>
     <div class="near" id="nearZone"></div>
+    <div id="stayCard"></div>
 
     <div class="quick">
       <a id="qPolice" href="https://www.google.com/maps/search/comisaria+policia" target="_blank" rel="noopener"><b>附近警察局</b><span>Google 地圖搜尋</span></a>
       <a id="qPharm" href="https://www.google.com/maps/search/farmacia" target="_blank" rel="noopener"><b>附近藥局</b><span>綠色十字招牌</span></a>
-      <button id="qWc"><b>找廁所</b><span>附近咖啡廳、百貨、速食店</span></button>
-      <a id="qTaxi" href="https://www.google.com/maps/search/parada+de+taxi" target="_blank" rel="noopener"><b>附近計程車招呼站</b><span>只搭白車有綠燈的正規計程車</span></a>
+      <button id="qWc"><b>找廁所</b><span>超市、咖啡廳、博物館</span></button>
+      <button id="qRide"><b>叫車</b><span>Uber、Cabify、FreeNow</span></button>
       <button data-share><b>傳位置給家人</b><span>LINE、訊息都可以</span></button>
       <button data-goto="tr"><b>求助字卡</b><span>拿給當地人看</span></button>
     </div>
@@ -904,7 +968,29 @@ nav button[aria-selected="true"]{color:var(--ink);font-weight:700}
   <section class="view" id="v-me">
     <h1>我的</h1>
 
-    <h2 style="margin-top:4px">緊急聯絡人</h2>
+    <h2 style="margin-top:4px">我的住宿</h2>
+    <div class="panel">
+      <p class="hint" style="margin:0 0 10px">依入住日期自動切換，「現在」只顯示今晚那一間。</p>
+      <div class="stays" id="stayList"></div>
+      <div class="form">
+        <b id="stFormTitle">新增住宿</b>
+        <label for="stName">飯店名稱</label>
+        <input id="stName" placeholder="訂房確認信上的名稱">
+        <label for="stAddr">地址（給司機看、導航用，照抄西文原文）</label>
+        <input id="stAddr" placeholder="Carrer de …, Barcelona">
+        <label for="stPhone">飯店電話（選填）</label>
+        <input id="stPhone" type="tel" inputmode="tel" placeholder="+34 …">
+        <div class="two">
+          <div><label for="stCi">入住</label><input id="stCi" type="date"></div>
+          <div><label for="stCo">退房</label><input id="stCo" type="date"></div>
+        </div>
+        <button class="btn ghost" id="stHere" style="margin-top:8px">人在飯店？用目前位置標記</button>
+        <span class="hint" id="stGeo" style="margin:0"></span>
+        <div class="row" style="margin-top:6px"><button class="btn" id="stSave" style="flex:1">儲存</button><button class="btn ghost" id="stCancel" style="display:none">取消</button></div>
+      </div>
+    </div>
+
+    <h2>緊急聯絡人</h2>
     <div class="panel">
       <div class="row">
         <input id="ecPhone" type="tel" inputmode="tel" placeholder="+886 912 345 678" autocomplete="tel">
@@ -918,11 +1004,21 @@ nav button[aria-selected="true"]{color:var(--ink);font-weight:700}
       <li><b>主力：Apple Pay 綁海外回饋信用卡。</b>西班牙感應付款非常普及，手機被偷時卡號也不會外流。</li>
       <li><b>刷卡機問要付台幣還是歐元，一律選歐元（EUR）。</b>選台幣會被動態貨幣轉換多收約 3–7%。</li>
       <li><b>備援：另一張不同發卡組織的實體卡</b>（Visa 配 Mastercard），跟主卡分開放。</li>
-      <li><b>現金 50–100 歐元</b>：市場小攤、小酒館、車站付費廁所的硬幣。</li>
+      <li><b>現金 50–100 歐元，盡量是 5、10、20 的小鈔</b>：市場小攤、小酒館、付費廁所用。50 歐元大鈔不好找開，放貼身腰包，需要時到廁所裡再拿出來補零錢包；也可以在超市結帳時把大鈔找開。</li>
+      <li><b>硬幣會越積越多</b>：買水、咖啡時優先用硬幣付，別讓零錢包越來越重。</li>
       <li><b>提款用銀行 ATM</b>（Santander、BBVA、CaixaBank），最好在銀行室內；街邊 Euronet 手續費高。同樣拒絕匯率轉換。</li>
       <li><b>購物退稅</b>：西班牙沒有最低消費門檻，結帳時要退稅單，離境前在機場 DIVA 機器掃描。</li>
       <li>把每張卡的<b>海外掛失電話</b>拍照存進下面的證件備份，並在銀行 App 開好「暫停卡片」功能。</li>
     </ul></div>
+
+    <h2>離線使用</h2>
+    <div class="panel">
+      <div class="row" style="justify-content:space-between"><span>安裝狀態</span><b id="offInstall"></b></div>
+      <div class="row" style="justify-content:space-between;margin-top:8px"><span>沒網路也能開啟 App</span><b id="offReady"></b></div>
+      <div class="row" style="justify-content:space-between;margin-top:8px"><span>已存的地圖圖磚</span><b id="offTiles">—</b></div>
+      <p class="hint">看過的地圖區域會自動存下來。出發前在 Wi‑Fi 下，把住宿附近和要去的景點都滑過、放大看一遍，到了當地沒網路也看得到。</p>
+      <div class="row" style="margin-top:8px"><button class="btn ghost" id="offClear">清除已存地圖</button><button class="btn ghost" id="obAgain">重看設定引導</button></div>
+    </div>
 
     <h2>證件備份（加密）</h2>
     <div class="panel" id="vault"></div>
@@ -955,14 +1051,70 @@ nav button[aria-selected="true"]{color:var(--ink);font-weight:700}
 <div class="sheet" id="wcSheet" role="dialog" aria-modal="true" aria-label="找廁所">
   <div class="box">
     <h2>找廁所</h2>
-    <p class="hint" style="margin:-4px 0 4px">西班牙公廁很少。咖啡廳點一杯咖啡就能借；百貨和購物中心通常免費。</p>
-    <a class="big" data-wcq="cafeteria" target="_blank" rel="noopener">附近咖啡廳</a>
-    <a class="big" data-wcq="El Corte Inglés" target="_blank" rel="noopener">附近百貨公司（El Corte Inglés）</a>
-    <a class="big" data-wcq="centro comercial" target="_blank" rel="noopener">附近購物中心</a>
-    <a class="big" data-wcq="McDonald's" target="_blank" rel="noopener">附近速食店</a>
+    <p class="hint" style="margin:-4px 0 0">牌子通常寫 <b>Aseos</b> 或 <b>WC</b>。公廁很少，下面這些地方最可靠。</p>
+    <div class="opts">
+      <a data-wcq="Mercadona" target="_blank" rel="noopener">Mercadona<span>超市，大多有廁所</span></a>
+      <a data-wcq="Carrefour" target="_blank" rel="noopener">Carrefour<span>選一般店，Express 小店通常沒有</span></a>
+      <a data-wcq="El Corte Inglés" target="_blank" rel="noopener">El Corte Inglés<span>百貨公司，樓上免費</span></a>
+      <a data-wcq="museo" target="_blank" rel="noopener">博物館 / 美術館<span>入口大廳常有廁所</span></a>
+      <a data-wcq="cafetería" target="_blank" rel="noopener">咖啡廳<span>點杯咖啡再借</span></a>
+      <a data-wcq="Burger King" target="_blank" rel="noopener">Burger King<span>廁所密碼常印在收據上</span></a>
+    </div>
     <button class="big" data-card="8" style="background:var(--olive)">顯示「借廁所」字卡</button>
     <button class="big close" id="wcClose">關閉</button>
   </div>
+</div>
+
+<div class="sheet" id="rideSheet" role="dialog" aria-modal="true" aria-label="叫車">
+  <div class="box">
+    <h2>叫車</h2>
+    <p class="hint" style="margin:-4px 0 0">優先用 App 叫車：價格先講好、路線有紀錄。巴塞隆納的 Uber 主要是派正規計程車。</p>
+    <div class="opts">
+      <a href="https://m.uber.com/ul/?action=setPickup&amp;pickup=my_location" target="_blank" rel="noopener">Uber<span>開啟 App 叫車</span></a>
+      <a href="https://cabify.com/" target="_blank" rel="noopener">Cabify<span>西班牙常用</span></a>
+      <a href="https://www.free-now.com/" target="_blank" rel="noopener">FreeNow<span>可叫正規計程車</span></a>
+      <a id="rideStand" href="https://www.google.com/maps/search/parada+de+taxi" target="_blank" rel="noopener">計程車招呼站<span>最後手段</span></a>
+    </div>
+    <p class="hint">路邊攔車只搭白色車身、車頂亮綠燈的正規計程車。出發前先把三個 App 裝好並綁卡。</p>
+    <button class="big" id="rideDriver" style="background:var(--ink);color:var(--bg)">顯示住宿地址給司機看</button>
+    <button class="big close" id="rideClose">關閉</button>
+  </div>
+</div>
+
+<div class="card-full" id="driverCard" role="dialog" aria-modal="true" aria-label="給司機看的地址">
+  <button class="x" id="drvX">關閉</button>
+  <div class="es">Lléveme a esta dirección, por favor.</div>
+  <div class="meta2" id="drvName"></div>
+  <div class="addr" id="drvAddr"></div>
+  <div class="tel" id="drvTel"></div>
+  <div class="zh">請載我到這個地址</div>
+  <div class="row2">
+    <button class="pri" id="drvSay">朗讀</button>
+    <a id="drvCall" href="#">撥打飯店</a>
+  </div>
+</div>
+
+<!-- in-app browser block -->
+<div class="ob" id="inapp" role="dialog" aria-modal="true" aria-label="請改用 Safari 開啟">
+  <div class="in">
+    <div class="warn">!</div>
+    <h1>請改用 Safari 開啟</h1>
+    <p style="font-size:16px;line-height:1.65">你現在是在 App 的內建瀏覽器裡（例如 LINE）。這裡<b>不能定位</b>，也<b>無法加入主畫面</b>，到了西班牙會用不了。</p>
+    <ol>
+      <li>點右上角的 <b>⋯</b> 或分享按鈕</li>
+      <li>選 <b>「用預設瀏覽器開啟」</b> 或 <b>「在 Safari 中打開」</b></li>
+      <li>在 Safari 裡會接著引導你設定</li>
+    </ol>
+    <div style="flex:1"></div>
+    <button class="big" id="inappCopy">複製網址</button>
+    <p class="sub">複製後打開 Safari，貼到網址列</p>
+    <button class="link" id="inappSkip">先在這裡看看就好</button>
+  </div>
+</div>
+
+<!-- onboarding -->
+<div class="ob" id="ob" role="dialog" aria-modal="true" aria-label="出發前設定">
+  <div class="in" id="obIn"></div>
 </div>
 
 <div class="card-full" id="cardFull" role="dialog" aria-modal="true">
@@ -1084,7 +1236,7 @@ const EXTRA = {
        {t:"wc",n:"El Corte Inglés（Pintor Sorolla）",d:"百貨公司樓上有免費廁所。位置為概略。",p:[39.4710,-0.3730]}]}
 };
 for(const c in EXTRA){CITIES[c].places.push(...EXTRA[c].p);CITIES[c].air=EXTRA[c].air;}
-const INTERCITY="城際交通：高鐵有 Renfe（AVE / Avlo）、Iryo、Ouigo 三家，越早訂越便宜；長途巴士用 Alsa。叫車用 Cabify 或 FreeNow（可叫正規計程車）。";
+const INTERCITY="城際交通：高鐵有 Renfe（AVE / Avlo）、Iryo、Ouigo 三家，越早訂越便宜；長途巴士用 Alsa。叫車優先用 Uber、Cabify 或 FreeNow，路邊招呼站是最後手段。";
 const PHRASES = [
   ["Necesito ayuda, por favor.","我需要幫助。"],
   ["Me han robado. ¿Dónde está la comisaría?","我被偷了。請問警察局在哪裡？"],
@@ -1093,8 +1245,8 @@ const PHRASES = [
   ["Me he perdido. ¿Cómo llego a esta dirección?","我迷路了，請問這個地址怎麼走？"],
   ["No hablo español. ¿Habla inglés?","我不會說西班牙文，你會說英文嗎？"],
   ["Soy alérgico/a al marisco.","我對海鮮過敏。"],
-  ["¿Dónde está el baño, por favor?","請問廁所在哪裡？"],
-  ["¿Puedo usar el baño? Voy a tomar un café.","我可以借廁所嗎？我會點一杯咖啡。"],
+  ["¿Dónde están los aseos, por favor?","請問廁所在哪裡？"],
+  ["¿Puedo usar el aseo? Voy a tomar un café.","我可以借廁所嗎？我會點一杯咖啡。"],
   ["¿Qué autobús va a esta dirección?","請問哪一班公車到這個地址？"],
   ["Lléveme a esta dirección, por favor.","請載我到這個地址（給計程車司機看）。"],
   ["¡Déjeme en paz!","請離我遠一點！"]
@@ -1132,12 +1284,13 @@ document.addEventListener("click", e=>{const g=e.target.closest("[data-goto]"); 
 
 /* ---------- status ---------- */
 function renderStatus(){
+  try{renderStay();}catch(e){}
   const st=$("#status");
   if(!pos){return;}
   const [c,cd]=nearestCity(pos);
   const near=$("#nearZone");
   $("#qPolice").href=`https://www.google.com/maps/search/comisaria+policia/@${pos[0]},${pos[1]},15z`;
-  $("#qTaxi").href=`https://www.google.com/maps/search/parada+de+taxi/@${pos[0]},${pos[1]},16z`;
+  $("#rideStand").href=`https://www.google.com/maps/search/parada+de+taxi/@${pos[0]},${pos[1]},16z`;
   $("#qPharm").href=`https://www.google.com/maps/search/farmacia/@${pos[0]},${pos[1]},16z`;
   const time = isNight() ? "夜間（21:00–06:00）標準" : "白天標準";
   if(cd>30000){
@@ -1227,7 +1380,7 @@ const TILE_PRIMARY={url:"https://tile.openstreetmap.org/{z}/{x}/{y}.png",sub:"ab
 const TILE_FALLBACK={url:"https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",sub:"abc",attr:'&copy; OpenStreetMap, tiles OSM France'};
 function initLeaflet(){
   LM=L.map("lmap",{zoomControl:false,attributionControl:true});
-  LMtiles=L.tileLayer(TILE_PRIMARY.url,{maxZoom:19,subdomains:TILE_PRIMARY.sub,attribution:TILE_PRIMARY.attr}).addTo(LM);
+  LMtiles=L.tileLayer(TILE_PRIMARY.url,{crossOrigin:"anonymous",maxZoom:19,subdomains:TILE_PRIMARY.sub,attribution:TILE_PRIMARY.attr}).addTo(LM);
   let errs=0, oks=0;
   LMtiles.on("tileload",()=>{oks++;});
   setTimeout(()=>{if(!oks){const r=$("#lmap").getBoundingClientRect();
@@ -1501,6 +1654,161 @@ async function renderVault(){
 }
 document.addEventListener("visibilitychange",()=>{if(document.hidden&&vkey){vkey=null;renderVault();}}); // auto-lock
 renderVault();
+
+/* ================= v2: stays, ride, onboarding, offline ================= */
+const UA=navigator.userAgent||"";
+const INAPP=/\bLine\/|FBAN|FBAV|Instagram|MicroMessenger|KAKAOTALK/i.test(UA);
+const STANDALONE=(navigator.standalone===true)||(window.matchMedia&&matchMedia("(display-mode: standalone)").matches);
+const IS_FRAMED=(()=>{try{return window.self!==window.top;}catch(e){return true;}})();
+
+/* ---- stays ---- */
+let stays=ls.get("ss_stays",[]), stEdit=null, stGeoTmp=null;
+const todayStr=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;};
+function pickStay(){
+  if(!stays.length) return [null,""];
+  const t=todayStr();
+  const now=stays.find(x=>x.ci&&x.co&&x.ci<=t&&t<x.co);
+  if(now) return [now,"我的住宿・今晚"];
+  const up=stays.filter(x=>x.ci&&x.ci>t).sort((a,b)=>a.ci.localeCompare(b.ci))[0];
+  if(up) return [up,`下一站・${up.ci.slice(5).replace("-","/")} 入住`];
+  return [stays[stays.length-1],"我的住宿"];
+}
+function stayDest(x){return (x.lat!=null)?`${x.lat},${x.lng}`:encodeURIComponent(x.addr||x.name);}
+function renderStay(){
+  const box=$("#stayCard"); if(!box) return;
+  const [x,label]=pickStay();
+  if(!x){box.innerHTML=`<div class="stay empty"><b>還沒設定住宿</b><span class="hint" style="margin:0">存好飯店地址，迷路時一鍵導航回去，或直接給司機看。</span><button class="btn" data-goto="me" style="align-self:flex-start">新增住宿</button></div>`;return;}
+  let d="";
+  if(pos&&x.lat!=null){const m=dist(pos,[x.lat,x.lng]);d=`距離 ${fmt(m)}${m<3000?`・步行約 ${Math.max(1,Math.round(m/80))} 分鐘`:""}`;}
+  box.innerHTML=`<div class="stay">
+    <div style="display:flex;align-items:center;gap:8px"><span class="tag">${esc(label)}</span><button class="ed" data-goto="me">編輯</button></div>
+    <div><div class="nm">${esc(x.name||"（未命名）")}</div><div class="ad">${esc(x.addr||"")}</div></div>
+    ${d?`<div class="ad">${d}</div>`:""}
+    <div class="two"><a class="go" href="https://www.google.com/maps/dir/?api=1&destination=${stayDest(x)}&travelmode=walking" target="_blank" rel="noopener">導航回飯店</a>
+    <button class="drv" data-driver="${esc(x.id)}">給司機看</button></div></div>`;
+}
+function renderStayList(){
+  const t=todayStr(), [cur]=pickStay();
+  $("#stayList").innerHTML=stays.length?stays.slice().sort((a,b)=>(a.ci||"").localeCompare(b.ci||"")).map(x=>`<div class="it${cur&&cur.id===x.id?" now":""}">
+    <div><b>${esc(x.name||"（未命名）")}</b><small>${esc(x.ci||"?")} → ${esc(x.co||"?")}${x.lat!=null?"・已標記座標":""}</small></div>
+    <button data-stedit="${esc(x.id)}">編輯</button><button class="del" data-stdel="${esc(x.id)}">刪除</button></div>`).join(""):`<p class="hint" style="margin:0">還沒有住宿。</p>`;
+}
+function stFormReset(){stEdit=null;stGeoTmp=null;["stName","stAddr","stPhone","stCi","stCo"].forEach(i=>$("#"+i).value="");
+  $("#stGeo").textContent="";$("#stFormTitle").textContent="新增住宿";$("#stCancel").style.display="none";}
+function showDriver(id){
+  const x=stays.find(s=>s.id===id)||pickStay()[0];
+  if(!x){toast("先到「我的」新增住宿");go("me");return;}
+  $("#drvName").textContent=x.name||""; $("#drvAddr").textContent=x.addr||"（沒有地址）";
+  $("#drvTel").textContent=x.phone?`Tel. ${x.phone}`:"";
+  const c=$("#drvCall"); if(x.phone){c.href="tel:"+x.phone.replace(/[^\d+]/g,"");c.style.display="";}else c.style.display="none";
+  document.querySelectorAll(".sheet.on").forEach(e=>e.classList.remove("on"));
+  $("#driverCard").classList.add("on");
+}
+document.addEventListener("click",e=>{
+  const d=e.target.closest("[data-driver]"); if(d){showDriver(d.dataset.driver);return;}
+  const ed=e.target.closest("[data-stedit]");
+  if(ed){const x=stays.find(s=>s.id===ed.dataset.stedit);if(!x)return;stEdit=x.id;stGeoTmp=x.lat!=null?[x.lat,x.lng]:null;
+    $("#stName").value=x.name||"";$("#stAddr").value=x.addr||"";$("#stPhone").value=x.phone||"";$("#stCi").value=x.ci||"";$("#stCo").value=x.co||"";
+    $("#stGeo").textContent=stGeoTmp?"已標記座標":"";$("#stFormTitle").textContent="編輯住宿";$("#stCancel").style.display="";$("#stName").focus();return;}
+  const del=e.target.closest("[data-stdel]");
+  if(del){if(!confirm("刪除這筆住宿？"))return;stays=stays.filter(s=>s.id!==del.dataset.stdel);ls.set("ss_stays",stays);renderStayList();renderStay();}
+});
+$("#stHere").addEventListener("click",async()=>{const p=await getOnce();if(!p){toast("抓不到定位");return;}
+  stGeoTmp=[p[0],p[1]];$("#stGeo").textContent=`已標記座標（精度約 ${fmt(p.acc||0)}）`;});
+$("#stCancel").addEventListener("click",stFormReset);
+$("#stSave").addEventListener("click",()=>{
+  const v={name:$("#stName").value.trim(),addr:$("#stAddr").value.trim(),phone:$("#stPhone").value.trim(),ci:$("#stCi").value,co:$("#stCo").value};
+  if(!v.name&&!v.addr){toast("至少填飯店名稱或地址");return;}
+  if(v.ci&&v.co&&v.co<=v.ci){toast("退房日要晚於入住日");return;}
+  if(stGeoTmp){v.lat=stGeoTmp[0];v.lng=stGeoTmp[1];}
+  if(stEdit){stays=stays.map(s=>s.id===stEdit?{...s,...v,lat:v.lat??null,lng:v.lng??null}:s);}
+  else stays.push({id:String(Date.now()),...v,lat:v.lat??null,lng:v.lng??null});
+  ls.set("ss_stays",stays);stFormReset();renderStayList();renderStay();toast("住宿已儲存");
+});
+$("#drvX").addEventListener("click",()=>{$("#driverCard").classList.remove("on");if("speechSynthesis" in window)speechSynthesis.cancel();});
+$("#drvSay").addEventListener("click",()=>speak(`Lléveme a esta dirección, por favor. ${$("#drvAddr").textContent}`,"es-ES"));
+renderStay(); renderStayList();
+
+/* ---- ride sheet ---- */
+$("#qRide").addEventListener("click",()=>$("#rideSheet").classList.add("on"));
+$("#rideClose").addEventListener("click",()=>$("#rideSheet").classList.remove("on"));
+$("#rideSheet").addEventListener("click",e=>{if(e.target.id==="rideSheet"||e.target.closest(".opts a"))e.currentTarget.classList.remove("on");});
+$("#rideDriver").addEventListener("click",()=>showDriver(null));
+
+/* ---- offline: service worker, banner, tile cache ---- */
+if(!IS_FRAMED && "serviceWorker" in navigator && window.isSecureContext){
+  navigator.serviceWorker.register("./sw.js").then(()=>offStatus()).catch(()=>{});
+}
+function updOnline(){const b=$("#offbar");if(b)b.style.display=navigator.onLine?"none":"block";}
+window.addEventListener("online",updOnline);window.addEventListener("offline",updOnline);updOnline();
+async function offStatus(){
+  $("#offInstall").textContent=STANDALONE?"已加入主畫面":"尚未加入主畫面";
+  $("#offInstall").style.color=STANDALONE?"var(--olive)":"var(--orange)";
+  const ctl="serviceWorker" in navigator&&navigator.serviceWorker.controller;
+  $("#offReady").textContent=IS_FRAMED?"此預覽不支援":(ctl?"是":"重新開啟一次後生效");
+  $("#offReady").style.color=ctl?"var(--olive)":"var(--muted)";
+  try{const c=await caches.open("ss-tiles");const k=await c.keys();$("#offTiles").textContent=`${k.length} 張`;}catch(e){$("#offTiles").textContent="—";}
+}
+$("#offClear").addEventListener("click",async()=>{if(!confirm("清除已存的地圖圖磚？"))return;try{await caches.delete("ss-tiles");}catch(e){}offStatus();toast("已清除");});
+offStatus();
+
+/* ---- in-app browser block ---- */
+if(INAPP && !IS_FRAMED) $("#inapp").classList.add("on");
+$("#inappCopy").addEventListener("click",async()=>{const u=location.href.split("?")[0].split("#")[0];
+  try{await navigator.clipboard.writeText(u);toast("網址已複製，到 Safari 貼上");}catch(e){prompt("複製這個網址到 Safari：",u);}});
+$("#inappSkip").addEventListener("click",()=>$("#inapp").classList.remove("on"));
+
+/* ---- onboarding ---- */
+let obLocOk=false;
+const tick='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>';
+function stepHtml(n,title,state,body){
+  return `<div class="step ${state}"><div class="hd"><div class="n">${state==="ok"?tick:n}</div><span>${title}</span></div>${state==="cur"&&body?`<div class="bd">${body}</div>`:""}</div>`;
+}
+function renderOb(){
+  const ec=!!ls.get("ss_ec","");
+  const done=[true,STANDALONE,obLocOk,ec];
+  const n=done.filter(Boolean).length;
+  const cur=done.indexOf(false);
+  let h=`<div style="display:flex;justify-content:space-between;align-items:baseline"><h1>出發前 4 步驟</h1><b style="color:var(--olive)">${n} / 4 完成</b></div>
+    <div class="bar"><i style="width:${n*25}%"></i></div>
+    <p class="hint" style="margin:0">在台灣有網路時做完，到西班牙就能直接用。</p>`;
+  h+=stepHtml(1,"用 Safari 開啟","ok");
+  if(!STANDALONE){
+    h+=stepHtml(2,"加入主畫面","cur",`1. 點 Safari 下方的分享鈕<br>2. 往下滑，選 <b>加入主畫面</b> → 新增<br>3. <b>從主畫面的新圖示打開</b>，繼續第 3、4 步<br><br><span style="color:var(--orange)">重要：主畫面 App 和 Safari 的資料是分開存的，聯絡人、住宿、證件請在主畫面 App 裡設定。</span>`);
+    h+=stepHtml(3,"允許定位","");h+=stepHtml(4,"緊急聯絡人","");
+    h+=`<div style="flex:1"></div><button class="link" id="obSkip">先在 Safari 試用看看</button>`;
+  }else{
+    h+=stepHtml(2,"加入主畫面","ok");
+    h+=stepHtml(3,"允許定位",obLocOk?"ok":(cur===2?"cur":""),`用來判斷你附近有沒有危險區。只在畫面開著時使用，不會上傳。<button class="big" id="obLoc" style="margin-top:10px">允許定位</button>`);
+    h+=stepHtml(4,"緊急聯絡人",ec?"ok":(cur===3?"cur":""),`家人或朋友的手機，SOS 會傳簡訊給他。<div class="row" style="margin-top:10px"><input id="obEc" type="tel" inputmode="tel" placeholder="+886 912 345 678" style="flex:1;min-width:0;border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:10px;font-size:16px"><button class="btn" id="obEcSave">儲存</button></div>`);
+    h+=`<div class="step"><div class="hd" style="font-weight:400;color:var(--muted)">選填：住宿地址、證件備份，之後在「我的」設定</div></div>`;
+    h+=`<div style="flex:1"></div>`;
+    h+= n===4 ? `<button class="big" id="obDone" style="background:var(--olive)">準備好了，開始使用</button>` : `<button class="link" id="obSkip">略過，直接使用</button>`;
+  }
+  $("#obIn").innerHTML=h;
+}
+function closeOb(){ls.set("ss_ob_done",true);$("#ob").classList.remove("on");}
+$("#ob").addEventListener("click",e=>{
+  const id=e.target.id;
+  if(id==="obSkip"||id==="obDone"){closeOb();if(id==="obDone")toast("到了西班牙，打開 App 按「開始定位」就好");return;}
+  if(id==="obLoc"){
+    if(!navigator.geolocation){toast("此瀏覽器不支援定位");return;}
+    e.target.textContent="定位中…";
+    navigator.geolocation.getCurrentPosition(p=>{obLocOk=true;pos=[p.coords.latitude,p.coords.longitude];pos.acc=p.coords.accuracy;renderOb();renderStatus();},
+      err=>{e.target.textContent="重試";toast(err.code===1?"被拒絕了：到 設定 → 隱私權 → 定位服務 → Safari 網站 改成「使用 App 期間」":"抓不到訊號，靠窗再試一次");},
+      {enableHighAccuracy:true,timeout:15000,maximumAge:60000});
+    return;
+  }
+  if(id==="obEcSave"){const v=$("#obEc").value.trim();if(!/^\+?\d[\d\s-]{6,}$/.test(v)){toast("號碼格式例如 +886912345678");return;}
+    ls.set("ss_ec",v);$("#ecPhone").value=v;renderOb();}
+});
+$("#obAgain").addEventListener("click",()=>{renderOb();$("#ob").classList.add("on");});
+if(!IS_FRAMED && !INAPP && !ls.get("ss_ob_done",false)){
+  // if location permission already granted, mark it done silently
+  if(navigator.permissions&&navigator.permissions.query){navigator.permissions.query({name:"geolocation"}).then(r=>{if(r.state==="granted"){obLocOk=true;renderOb();}}).catch(()=>{});}
+  renderOb(); $("#ob").classList.add("on");
+}
+
 </script>
 </body>
 </html>
