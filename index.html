@@ -816,6 +816,17 @@ nav button[aria-selected="true"]{color:var(--ink);font-weight:700}
 .opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
 .opts a{display:flex;flex-direction:column;justify-content:center;min-height:64px;padding:10px 12px;border-radius:14px;background:var(--cobalt-soft);color:var(--ink);text-decoration:none;font-weight:700;font-size:15px;line-height:1.3}
 .opts a span{font-weight:400;font-size:12.5px;color:var(--muted);margin-top:2px}
+/* transit guide */
+.tg h3{font-family:"Noto Serif TC",serif;font-size:17px;margin:18px 0 8px}
+.tg ol,.tg ul{margin:0;padding-left:22px}
+.tg li{margin-bottom:7px;font-size:15px;line-height:1.6}
+.tg .city{background:var(--olive-soft);border-radius:14px;padding:12px 14px;margin-top:10px}
+.tg .city li{font-size:14.5px}
+.tg table{width:100%;border-collapse:collapse;font-size:14.5px}
+.tg td{padding:7px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+.tg td:first-child{font-weight:700;white-space:nowrap;padding-right:12px}
+.tg .note{font-size:12.5px;color:var(--muted);margin-top:12px}
+.quick .wide{grid-column:1/-1}
 /* offline banner */
 .offbar{display:none;background:var(--ink);color:var(--bg);border-radius:14px;padding:10px 14px;font-size:14px;margin-bottom:10px}
 .offbar b{color:var(--saffron)}
@@ -896,6 +907,7 @@ nav button[aria-selected="true"]{color:var(--ink);font-weight:700}
       <a id="qPharm" href="https://www.google.com/maps/search/farmacia" target="_blank" rel="noopener"><b>附近藥局</b><span>綠色十字招牌</span></a>
       <button id="qWc"><b>找廁所</b><span>超市、咖啡廳、博物館</span></button>
       <button id="qRide"><b>叫車</b><span>Uber、Cabify、FreeNow</span></button>
+      <button id="qTransit" class="wide"><b>地鐵、公車怎麼搭</b><span>買票、感應、轉乘、下車，加上看得懂的站內單字</span></button>
       <button data-share><b>傳位置給家人</b><span>LINE、訊息都可以</span></button>
       <button data-goto="tr"><b>求助字卡</b><span>拿給當地人看</span></button>
     </div>
@@ -936,6 +948,7 @@ nav button[aria-selected="true"]{color:var(--ink);font-weight:700}
       <button data-f="fav" aria-pressed="false">★ 收藏</button>
     </div>
     <div class="air" id="air"></div>
+    <button class="btn ghost" id="mapTransit" style="width:100%;margin-bottom:10px">地鐵、公車怎麼搭</button>
     <div class="hint" id="baseHint"></div>
     <div class="list" id="list"></div>
   </section>
@@ -1078,6 +1091,15 @@ nav button[aria-selected="true"]{color:var(--ink);font-weight:700}
     <p class="hint">路邊攔車只搭白色車身、車頂亮綠燈的正規計程車。出發前先把三個 App 裝好並綁卡。</p>
     <button class="big" id="rideDriver" style="background:var(--ink);color:var(--bg)">顯示住宿地址給司機看</button>
     <button class="big close" id="rideClose">關閉</button>
+  </div>
+</div>
+
+<div class="sheet" id="transitSheet" role="dialog" aria-modal="true" aria-label="地鐵公車怎麼搭">
+  <div class="box tg">
+    <h2>地鐵、公車怎麼搭</h2>
+    <div class="chips" id="tgCities"></div>
+    <div id="tgBody"></div>
+    <button class="big close" id="tgClose" style="margin-top:16px">關閉</button>
   </div>
 </div>
 
@@ -1249,6 +1271,8 @@ const PHRASES = [
   ["¿Puedo usar el aseo? Voy a tomar un café.","我可以借廁所嗎？我會點一杯咖啡。"],
   ["¿Qué autobús va a esta dirección?","請問哪一班公車到這個地址？"],
   ["Lléveme a esta dirección, por favor.","請載我到這個地址（給計程車司機看）。"],
+  ["¿Dónde tengo que bajar para ir aquí?","要去這裡，我該在哪一站下車？"],
+  ["¿Me avisa cuando lleguemos, por favor?","到站時可以提醒我嗎？"],
   ["¡Déjeme en paz!","請離我遠一點！"]
 ];
 const LV = [["安全","s0"],["留意","s1"],["小心","s2"],["避開","s3"]];
@@ -1685,7 +1709,8 @@ function renderStay(){
     <div><div class="nm">${esc(x.name||"（未命名）")}</div><div class="ad">${esc(x.addr||"")}</div></div>
     ${d?`<div class="ad">${d}</div>`:""}
     <div class="two"><a class="go" href="https://www.google.com/maps/dir/?api=1&destination=${stayDest(x)}&travelmode=walking" target="_blank" rel="noopener">導航回飯店</a>
-    <button class="drv" data-driver="${esc(x.id)}">給司機看</button></div></div>`;
+    <button class="drv" data-driver="${esc(x.id)}">給司機看</button></div>
+    <a href="https://www.google.com/maps/dir/?api=1&destination=${stayDest(x)}&travelmode=transit" target="_blank" rel="noopener" style="color:#F2BE3C;font-weight:700;font-size:14px;text-decoration:none;text-align:center;padding:4px">改搭地鐵、公車回去 →</a></div>`;
 }
 function renderStayList(){
   const t=todayStr(), [cur]=pickStay();
@@ -1728,6 +1753,95 @@ $("#stSave").addEventListener("click",()=>{
 $("#drvX").addEventListener("click",()=>{$("#driverCard").classList.remove("on");if("speechSynthesis" in window)speechSynthesis.cancel();});
 $("#drvSay").addEventListener("click",()=>speak(`Lléveme a esta dirección, por favor. ${$("#drvAddr").textContent}`,"es-ES"));
 renderStay(); renderStayList();
+
+
+/* ---- transit guide ---- */
+const TRANSIT={
+  "馬德里":[
+    "<b>地鐵：直接感應信用卡或手機就能進站。</b>2026 年 6 月起全線閘門都能刷卡付單程票，不必先買交通卡。",
+    "要搭很多次，可以在站內售票機買交通卡（Tarjeta Transporte Público）加值 10 次票，地鐵和市區公車都能用。",
+    "市區公車（EMT，藍色車身）：前門上車，感應信用卡或交通卡。",
+    "機場站（8 號線）票價規則和市區不同，以站內標示為準。",
+    "深夜公車叫 <b>Búho</b>，大多從 Cibeles 廣場發車。"
+  ],
+  "巴塞隆納":[
+    "<b>地鐵、TMB 公車都能直接感應信用卡或手機付單程票。</b>查票時出示你感應用的那張卡。",
+    "搭很多次就在售票機買 <b>T-casual</b>（10 趟），75 分鐘內地鐵、公車、輕軌互相轉乘只算一趟。",
+    "<b>機場站（L9 Sud）要另買機場票</b>，T-casual 不能用；Aerobús 機場巴士則上車刷卡。",
+    "L1、L3 經過蘭布拉大道、加泰隆尼亞廣場，是扒手最多的路段。",
+    "深夜公車叫 <b>NitBus</b>，多數經過加泰隆尼亞廣場。"
+  ],
+  "塞維亞":[
+    "<b>地鐵只有 1 號線</b>，閘門可以直接感應信用卡或手機；出站閘門同樣要感應同一張卡。",
+    "市區公車（TUSSAM）：前門上車，可以感應信用卡付單程票。",
+    "古城區（大教堂、聖十字區、特里亞納）大多走路就到，公車主要用在去較遠的景點或車站。",
+    "機場巴士 <b>EA</b> 可以上車刷卡。"
+  ],
+  "格拉納達":[
+    "地鐵（其實是輕軌）在車站售票機買票，上車前先在月台機器買好。",
+    "市區公車可以上車向司機買單程票，或買儲值卡 <b>Credibús</b>，多次搭乘比較划算。",
+    "去阿爾罕布拉宮搭 <b>C30、C32</b> 紅色小巴，從市中心上山。",
+    "阿爾拜辛區巷弄窄、坡多，小巴到不了的地方只能走路。"
+  ],
+  "瓦倫西亞":[
+    "<b>地鐵、輕軌不能直接刷信用卡進站</b>，要在站內售票機買卡片：單程票，或 <b>SUMA 10</b>（10 趟，地鐵和公車可互轉）。",
+    "市區公車（EMT，紅色車身）可以上車感應信用卡付單程票。",
+    "機場在 3、5 號線上，機場站票價比市區高。",
+    "去海灘搭輕軌 4、6 號線或公車都可以。"
+  ]
+};
+const TG_COMMON=`
+<h3>搭地鐵：6 個步驟</h3>
+<ol>
+  <li>找寫著 <b>Metro</b> 的入口，往 <b>Entrada</b>（入口）走。</li>
+  <li>能刷卡的城市，直接把信用卡或手機貼在閘門的感應區；不能刷卡就到售票機買票，機器可以切換成英文。</li>
+  <li>月台用「往哪個終點站」標方向：先確認路線號碼和顏色，再看 <b>Dirección</b> 後面的終點站名。</li>
+  <li>轉乘跟著 <b>Correspondencia</b> 或 <b>Transbordo</b> 的指標走。</li>
+  <li>出站找 <b>Salida</b>（出口）。車票或刷過的卡要保留到出站，途中可能查票。</li>
+  <li>上下車時包包背在前面，不要站在車門邊滑手機，門口是扒手最常下手的地方。</li>
+</ol>
+<h3>搭公車：5 個步驟</h3>
+<ol>
+  <li>站牌叫 <b>Parada</b>，上面寫著經過的路線號碼。車來了要<b>舉手示意</b>，不然可能直接開走。</li>
+  <li>從<b>前門</b>上車，感應信用卡、交通卡，或向司機買票。付現盡量用零錢或小鈔，大鈔司機可能不收。</li>
+  <li>車上螢幕會顯示 <b>Próxima parada</b>（下一站）。</li>
+  <li>要下車前按 <b>STOP</b> 或 <b>Parada solicitada</b> 按鈕，否則不一定會停。</li>
+  <li>從<b>中間或後門</b>下車。不確定在哪站下，就打開翻譯分頁的字卡問司機。</li>
+</ol>
+<h3>看得懂這些字就不會迷路</h3>
+<table>
+  <tr><td>Salida</td><td>出口</td></tr>
+  <tr><td>Entrada</td><td>入口</td></tr>
+  <tr><td>Andén</td><td>月台</td></tr>
+  <tr><td>Dirección</td><td>往…方向（後面接終點站名）</td></tr>
+  <tr><td>Correspondencia / Transbordo</td><td>轉乘</td></tr>
+  <tr><td>Parada</td><td>站牌、車站</td></tr>
+  <tr><td>Próxima parada</td><td>下一站</td></tr>
+  <tr><td>Billete sencillo</td><td>單程票</td></tr>
+  <tr><td>Validar</td><td>感應、驗票</td></tr>
+  <tr><td>Taquilla</td><td>售票窗口</td></tr>
+</table>
+<h3>最省事的做法</h3>
+<ul>
+  <li>用 <b>Google 地圖</b>查路線，選「大眾運輸」，會告訴你搭幾號線、往哪個方向、在哪站轉車和下車。</li>
+  <li>地鐵、公車都能刷卡的城市，<b>直接用 Apple Pay 感應</b>最簡單，不用研究票種。</li>
+  <li>整趟旅程<b>固定用同一張卡或同一支手機</b>感應，查票和轉乘優惠才對得起來。</li>
+</ul>
+<p class="note">票價和票種規則會調整，以站內售票機和官方標示為準。</p>`;
+let tgCity=null;
+function renderTransit(){
+  const c=tgCity||city;
+  $("#tgCities").innerHTML=Object.keys(TRANSIT).map(k=>`<button data-tgc="${k}" aria-pressed="${k===c}">${k}</button>`).join("");
+  $("#tgBody").innerHTML=`<div class="city"><b>${esc(c)}</b><ul style="margin-top:6px">${TRANSIT[c].map(x=>`<li>${x}</li>`).join("")}</ul></div>`+TG_COMMON;
+}
+function openTransit(){tgCity=null;renderTransit();$("#transitSheet").classList.add("on");$("#transitSheet .box").scrollTop=0;}
+$("#qTransit").addEventListener("click",openTransit);
+$("#mapTransit").addEventListener("click",openTransit);
+$("#tgClose").addEventListener("click",()=>$("#transitSheet").classList.remove("on"));
+$("#transitSheet").addEventListener("click",e=>{
+  if(e.target.id==="transitSheet"){e.currentTarget.classList.remove("on");return;}
+  const b=e.target.closest("[data-tgc]"); if(b){tgCity=b.dataset.tgc;renderTransit();}
+});
 
 /* ---- ride sheet ---- */
 $("#qRide").addEventListener("click",()=>$("#rideSheet").classList.add("on"));
