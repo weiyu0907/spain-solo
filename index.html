@@ -1516,9 +1516,9 @@ function initLeaflet(){
   LMtiles=L.tileLayer(TILE_PRIMARY.url,{crossOrigin:"anonymous",maxZoom:19,subdomains:TILE_PRIMARY.sub,attribution:TILE_PRIMARY.attr});
   let errs=0, oks=0;
   LMtiles.on("tileload",()=>{oks++;});
-  setTimeout(()=>{if(!oks){const r=$("#lmap").getBoundingClientRect();
+  setTimeout(()=>{if(!oks&&!(LMvec&&LM.hasLayer(LMvec))){const r=$("#lmap").getBoundingClientRect();
     $("#mapHint").textContent=`地圖診斷：Leaflet=${!!window.L}｜圖磚 成功${oks}/失敗${errs}｜大小 ${Math.round(r.width)}×${Math.round(r.height)}｜online=${navigator.onLine}`;}},6000);
-  LMtiles.on("tileerror",()=>{if(!LM.hasLayer(LMtiles))return;errs++;
+  LMtiles.on("tileerror",()=>{if(!LM.hasLayer(LMtiles)||(LMvec&&LM.hasLayer(LMvec)))return;errs++;
     if(errs===5&&!LM._gotTile&&!LM._osm){LM._osm=true;errs=0;LMtiles.options.subdomains=TILE_FALLBACK.sub;LMtiles.setUrl(TILE_FALLBACK.url);return;}
     if(errs>12&&LM._osm&&!LM._gotTile){leafFailed=true;$("#mapwrap").classList.remove("leaf");$("#mapHint").textContent="街道地圖載入失敗（可能沒有網路），已改用示意地圖。";renderSvgMap();}});
   LMtiles.on("tileload",()=>{LM._gotTile=true;});
@@ -1542,6 +1542,7 @@ async function setBase(){
       }catch(e){console.error(e);LMvec=null;LMvecKey=null;}
     }
     if(LMvec){if(LM.hasLayer(LMtiles))LM.removeLayer(LMtiles);if(!LM.hasLayer(LMvec))LMvec.addTo(LM);LMvec.bringToBack();
+      leafFailed=false;$("#mapwrap").classList.add("leaf");LM.invalidateSize();
       $("#mapHint").textContent="使用已下載的離線地圖。紅圈是危險區範圍（依目前時段深淺）。點地點可以導航；按 G↗ 用 Google 地圖查店家和轉乘。";return;}
   }
   if(LMvec&&LM.hasLayer(LMvec))LM.removeLayer(LMvec);
@@ -1582,6 +1583,7 @@ function renderLeaflet(){
   }
 }
 function renderMap(){
+  if(!FRAMED && leafFailed && window.L && PACKS[city]){packHas(PACKS[city].key).then(h=>{if(h){leafFailed=false;renderMap();}});}
   if(!FRAMED && !leafFailed){
     if(window.L){$("#mapwrap").classList.add("leaf");renderLeaflet();return;}
     loadLeaflet().then(ok=>{if(ok){$("#mapwrap").classList.add("leaf");renderLeaflet();}else{leafFailed=true;renderSvgMap();}});
@@ -2022,7 +2024,11 @@ const PACKS={"巴塞隆納":{key:"barcelona",mb:16},"馬德里":{key:"madrid",mb
 const PACK_CACHE="ss-maps", packUrl=k=>`./tiles/${k}.pmtiles`;
 const packBusy={};
 async function packBlob(key){
-  try{const c=await caches.open(PACK_CACHE);const r=await c.match(packUrl(key));return r?await r.blob():null;}catch(e){return null;}
+  for(let i=0;i<2;i++){
+    try{const c=await caches.open(PACK_CACHE);const r=await c.match(packUrl(key));if(!r)return null;return await r.blob();}
+    catch(e){await new Promise(r=>setTimeout(r,400));}
+  }
+  return null;
 }
 async function packHas(key){try{const c=await caches.open(PACK_CACHE);return !!(await c.match(packUrl(key)));}catch(e){return false;}}
 async function renderPacks(){
