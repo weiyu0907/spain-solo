@@ -6,11 +6,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="西班牙獨旅">
-<meta name="theme-color" content="#1E3F99">
+<meta name="theme-color" content="#FFFFFF">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <title>西班牙獨旅</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 /* Leaflet 1.9.4 (BSD-2-Clause) */
 /* required styles */
@@ -906,6 +906,175 @@ nav button[aria-selected="true"]{color:var(--ink);font-weight:700}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--tabh) + 100px + env(safe-area-inset-bottom,0px));
   background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;z-index:60;display:none}
 .toast.on{display:block}
+
+/* ===== v3 visual: 4a 路線圖風 ===== */
+:root{
+  --bg:#FFFFFF;--card:#FFFFFF;--soft:#F3F5F8;--ink:#111827;--muted:#5F6B7A;--line:#E3E7EE;
+  --cobalt:#111827;--cobalt-soft:#F3F5F8;--on-pri:#FFFFFF;
+  --accent:#D6006E;--accent-soft:#FCE6F1;
+  --saffron:#C98A00;--saffron-soft:#FFF4D6;
+  --olive:#1E9E5A;--olive-soft:#E3F5EB;--orange:#E0671E;--orange-soft:#FDEBDD;--red:#D62828;--red-soft:#FDECEC;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1116;--card:#161A21;--soft:#1E232C;--ink:#F2F4F7;--muted:#9AA3B2;--line:#2A303A;
+  --cobalt:#F2F4F7;--cobalt-soft:#1E232C;--on-pri:#111827;
+  --accent:#FF5AA8;--accent-soft:#3A1428;
+  --saffron:#F2BE3C;--saffron-soft:#3A2F12;
+  --olive:#5ED394;--olive-soft:#14301F;--orange:#FF9B5E;--orange-soft:#3A2216;--red:#FF6B6B;--red-soft:#3B1719;}}
+:root[data-theme="dark"]{
+  --bg:#0E1116;--card:#161A21;--soft:#1E232C;--ink:#F2F4F7;--muted:#9AA3B2;--line:#2A303A;
+  --cobalt:#F2F4F7;--cobalt-soft:#1E232C;--on-pri:#111827;
+  --accent:#FF5AA8;--accent-soft:#3A1428;
+  --saffron:#F2BE3C;--saffron-soft:#3A2F12;
+  --olive:#5ED394;--olive-soft:#14301F;--orange:#FF9B5E;--orange-soft:#3A2216;--red:#FF6B6B;--red-soft:#3B1719;}
+body{font-family:"Noto Sans TC","PingFang TC",system-ui,sans-serif}
+main{padding-top:calc(16px + env(safe-area-inset-top,0px))}
+h1{font-family:inherit;font-weight:900;font-size:32px;letter-spacing:-.5px;margin:4px 88px 14px 0;line-height:1.15}
+h2{font-family:inherit;font-weight:900;font-size:18px;margin:26px 0 10px}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+select{font:inherit;color:inherit}
+/* buttons */
+.big,.btn,.pack button{background:var(--cobalt);color:var(--on-pri)}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.btn.warn{border-width:2px}
+.big{border-radius:14px;min-height:52px}
+.sheet .close{border-width:2px}
+.sheet .call{background:var(--red);color:#fff}
+/* status */
+.status{border-width:0;border-radius:20px;padding:18px 18px 16px}
+.status .lv{font-family:inherit;font-size:36px;letter-spacing:-.5px}
+.sx{--sbg:var(--soft)}
+/* quick actions: soft tiles, no outline */
+.quick{gap:8px}
+.quick a,.quick button{background:var(--soft);border:0;border-radius:14px;padding:13px 14px;min-height:64px}
+.quick b{font-weight:900}
+/* lists: dot instead of left border */
+.item{border-left:0;border-radius:14px;background:var(--soft)}
+.item h3::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--c);margin-right:8px;vertical-align:1px}
+.item.sight{--c:#0078BF}.item.food{--c:var(--saffron)}.item.danger{--c:var(--red)}.item.trans{--c:var(--olive)}.item.wc{--c:var(--muted)}
+.acts a,.acts button{color:var(--ink)}
+.chips button{border:2px solid var(--line);border-radius:10px;font-weight:700;font-size:14px;color:var(--muted)}
+.chips button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.panel{border:0;background:var(--soft)}
+.row input,.form input,#notes,#trIn{background:var(--card);border:2px solid var(--line)}
+.air{background:var(--soft)}
+.phr button{border:0;background:var(--soft)}
+.phr .say{color:var(--accent)}
+.lost details{background:var(--card);border:0}
+.packs{border:0}.pack{background:var(--card)}
+.step{border:0;background:var(--soft)}.step.cur{border:2px solid var(--ink);background:var(--card)}
+.step.cur .n{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.ob ol{border:0;background:var(--soft)}
+.opts a{background:var(--soft)}
+.dir button{border:2px solid var(--line)}
+#trOut{background:var(--accent-soft)}
+.tg h3{font-family:inherit;font-weight:900}
+.tg .city{background:var(--soft)}
+.stays .it{border:2px solid var(--line);background:var(--card)}.stays .it.now{border-color:var(--ink)}
+.stays .it button{color:var(--ink)}
+.mapwrap{border:0;border-radius:18px}
+.mapctl button{border:0;box-shadow:0 1px 6px rgba(17,24,39,.18);color:var(--ink)}
+.pick{border:0;background:var(--soft)}
+.card-full .row2 a,.card-full .row2 button{border:2px solid #111827;color:#111827}
+.card-full .row2 .pri{background:#111827;color:#fff}
+.card-full .speak{background:#111827}
+.lp-nav a{background:#111827}.lp-nav a+a{color:#111827!important;border-color:#111827}
+/* stay card keeps its dark block, retuned */
+.stay{background:#111827}
+.stay .tag{color:#FFC94D}
+.stay .go{background:#FFC94D;color:#111827}
+/* SOS: top-right pill instead of floating disc */
+.sos{top:calc(14px + env(safe-area-inset-top,0px));bottom:auto;right:16px;width:auto;height:42px;padding:0 18px;border-radius:999px;font-size:16px;box-shadow:0 2px 10px rgba(214,40,40,.35)}
+/* tab bar with line icons */
+nav{border-top:1px solid var(--line)}
+nav button{font-size:11.5px;gap:3px}
+nav button svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+nav button[aria-selected="true"]{color:var(--ink);font-weight:900}
+nav button[aria-selected="true"] svg{stroke-width:2.4}
+.toast{bottom:calc(var(--tabh) + 84px + env(safe-area-inset-bottom,0px))}
+
+/* top bar holding SOS: transparent at top, solid once scrolled */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:21;height:calc(64px + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) 16px 0;display:flex;align-items:center;gap:10px;pointer-events:none;transition:background-color .2s}
+.topbar>*{pointer-events:auto}
+.topbar .tt{flex:1;font-weight:900;font-size:17px;opacity:0;transition:opacity .2s;pointer-events:none}
+.topbar.solid{background:var(--bg);background:color-mix(in srgb,var(--bg) 94%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--line)}
+.topbar.solid .tt{opacity:1}
+.topbar .sos{position:static;background:#D62828;color:#fff}
+@media (prefers-reduced-motion:reduce){.topbar,.topbar .tt{transition:none}}
+.warnbox.l1{color:#7A5300}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .warnbox.l1{color:var(--saffron)}}
+:root[data-theme="dark"] .warnbox.l1{color:var(--saffron)}
+/* ===== trip ===== */
+.tr-sub{font-size:13px;font-weight:700;color:var(--muted)}
+.tr-title{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:2px 88px 0 0}
+.tr-title h1{margin:0}
+.tr-title span{font-size:15px;font-weight:700;color:var(--muted)}
+.days{display:flex;gap:8px;overflow-x:auto;padding:14px 0 2px;scrollbar-width:none}
+.days button{flex:none;height:38px;padding:0 14px;border-radius:10px;border:2px solid var(--line);background:var(--card);color:var(--muted);font-weight:700;font-size:14px;white-space:nowrap}
+.days button[aria-pressed="true"]{background:var(--dc);border-color:var(--dc);color:#fff}
+.days .add{border-style:dashed;width:38px;padding:0;font-size:20px}
+.tr-tools{display:flex;gap:8px;margin:12px -16px 0;padding:0 16px;overflow-x:auto;scrollbar-width:none}
+.tr-tools button{flex:none;white-space:nowrap;height:36px;padding:0 12px;border-radius:10px;border:0;background:var(--soft);color:var(--ink);font-weight:700;font-size:13.5px}
+.strip{margin-top:12px;border-radius:16px;overflow:hidden;background:var(--soft);position:relative}
+.strip svg{display:block;width:100%;height:120px}
+.strip .sum{padding:10px 12px 0;font-size:12.5px;font-weight:700;color:var(--muted)}
+.tl{margin-top:16px;display:grid;grid-template-columns:52px 26px 1fr;column-gap:12px}
+.tl .t{font-size:17px;font-weight:900;padding-top:4px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tl .t.empty{color:var(--muted);font-weight:700;font-size:14px;padding-top:6px}
+.rail{position:relative;display:flex;justify-content:center}
+.rail::before{content:"";position:absolute;left:10px;width:6px;top:0;bottom:0;background:var(--dc)}
+.rail.first::before{top:14px}.rail.last::before{bottom:calc(100% - 14px)}.rail.only::before{display:none}
+.rail.walk::before{background:repeating-linear-gradient(var(--dc) 0 6px,transparent 6px 12px)}
+.rail.none::before{background:repeating-linear-gradient(var(--line) 0 6px,transparent 6px 12px)}
+.dot{position:relative;z-index:1;width:26px;height:26px;border-radius:50%;background:var(--card);border:5px solid var(--dc);margin-top:2px;box-sizing:border-box}
+.dot.d2{border-color:var(--red);box-shadow:0 0 0 4px rgba(214,40,40,.2)}
+.stopbtn{text-align:left;background:none;border:0;padding:2px 0 14px;color:inherit;width:100%}
+.stopbtn b{display:block;font-size:19px;font-weight:900;line-height:1.3}
+.stopbtn small{display:block;font-size:13.5px;color:var(--muted);margin-top:2px}
+.warnbox{display:flex;gap:8px;align-items:flex-start;margin-top:8px;padding:9px 11px;border-radius:12px;background:var(--red-soft);color:var(--red);font-size:13.5px;line-height:1.5}
+.warnbox.l1{background:var(--saffron-soft);color:var(--saffron)}
+.warnbox svg{flex:none;margin-top:2px}
+.leg{display:flex;align-items:center;gap:8px;padding:10px 0 14px;font-size:13.5px;color:var(--muted);flex-wrap:wrap}
+.leg a,.leg button{margin-left:auto;font-weight:700;color:var(--ink);text-decoration:none;background:none;border:0;padding:4px 0;font-size:13.5px}
+.lb{display:inline-flex;align-items:center;height:22px;padding:0 7px;border-radius:6px;color:#fff;font-weight:900;font-size:12.5px}
+.tr-empty{margin-top:22px;padding:22px 18px;border-radius:18px;background:var(--soft);text-align:center;color:var(--muted);line-height:1.7}
+.tr-empty b{display:block;color:var(--ink);font-size:18px;margin-bottom:4px}
+.tr-add{position:fixed;left:16px;right:16px;bottom:calc(var(--tabh) + 12px + env(safe-area-inset-bottom,0px));max-width:528px;margin:0 auto;height:52px;border:0;border-radius:14px;background:var(--cobalt);color:var(--on-pri);font-weight:900;font-size:16px;z-index:15}
+.res{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.res button{display:flex;gap:10px;align-items:center;text-align:left;background:var(--soft);border:0;border-radius:12px;padding:10px 12px;color:inherit}
+.res button span{flex:1;min-width:0}
+.res button b{display:block;font-size:15px}
+.res button small{display:block;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res button i{font-style:normal;font-weight:900;font-size:20px;color:var(--accent)}
+.seg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.seg button{height:40px;border-radius:10px;border:2px solid var(--line);background:var(--card);font-weight:700;font-size:13.5px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.sheet h3{font-size:14px;margin:16px 0 6px;color:var(--muted)}
+.sheet .form input,.sheet .form select,.sheet textarea{border:2px solid var(--line);background:var(--card);border-radius:10px;padding:10px;font-size:16px;min-width:0;width:100%}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btnrow>*{flex:1;min-width:120px;text-align:center;text-decoration:none}
+.today{margin-top:14px;padding:14px 16px;border-radius:18px;background:var(--soft);display:flex;gap:12px;align-items:center}
+.today .tdot{width:22px;height:22px;border-radius:50%;border:5px solid var(--dc);flex:none}
+.today div{flex:1;min-width:0}
+.today small{display:block;font-size:12.5px;color:var(--muted);font-weight:700}
+.today b{display:block;font-size:17px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.today button{border:0;background:var(--ink);color:var(--bg);border-radius:10px;height:38px;padding:0 12px;font-weight:700}
+.pickbar{display:none;margin-bottom:10px;padding:12px 14px;border-radius:14px;background:var(--ink);color:var(--bg);align-items:center;gap:10px;font-size:14.5px}
+.pickbar.on{display:flex}
+.pickbar span{flex:1}
+.pickbar button{border:0;border-radius:10px;height:36px;padding:0 12px;background:var(--bg);color:var(--ink);font-weight:700}
+/* metro bar on map tab */
+.metro{margin-top:10px;padding:12px;border-radius:16px;background:var(--soft)}
+.metro .chips{padding:0}
+.metro .chips button{min-width:44px;height:34px;padding:0 10px;border:0;color:#fff;background:var(--lc)}
+.metro .chips button[aria-pressed="false"]{background:var(--card);color:var(--muted);box-shadow:inset 0 0 0 2px var(--line)}
+.metro .chips button.trip{--lc:var(--accent)}
+.metro .chips button.all{--lc:var(--ink);color:var(--bg)}
+.metro .chips button.all[aria-pressed="false"]{color:var(--muted)}
+.metro .hint{margin-top:8px}
+.metro a.btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;margin-top:10px;width:100%;min-height:44px}
+.trip-pin{width:24px;height:24px;border-radius:50%;color:#fff;font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);font-family:"Noto Sans TC",sans-serif}
+
 </style>
 </head>
 <body>
@@ -922,6 +1091,7 @@ nav button[aria-selected="true"]{color:var(--ink);font-weight:700}
     </div>
     <button class="big" id="locBtn">開始定位</button>
     <div class="near" id="nearZone"></div>
+    <div id="tripToday"></div>
     <div id="stayCard"></div>
 
     <div class="quick">
@@ -943,9 +1113,19 @@ nav button[aria-selected="true"]{color:var(--ink);font-weight:700}
     </div>
   </section>
 
+  <!-- TRIP -->
+  <section class="view" id="v-trip" style="--dc:#D6006E">
+    <div id="tripHead"></div>
+    <div class="days" id="tripDays"></div>
+    <div class="tr-tools" id="tripTools"></div>
+    <div id="tripBody"></div>
+    <button class="tr-add" id="trAdd">＋ 加入景點</button>
+  </section>
+
   <!-- EXPLORE -->
   <section class="view" id="v-explore">
     <h1>地圖</h1>
+    <div class="pickbar" id="pickBar"><span id="pickText">點地圖選位置</span><button id="pickCancel">取消</button></div>
     <div class="chips" id="cities"></div>
     <div class="mapwrap" id="mapwrap">
       <div id="lmap"></div>
@@ -959,6 +1139,7 @@ nav button[aria-selected="true"]{color:var(--ink);font-weight:700}
       <div class="scale" id="scale"></div>
     </div>
     <div class="pick" id="pick"></div>
+    <div class="metro" id="metro"></div>
     <p class="hint" id="mapHint">紅圈是危險區範圍（依目前時段深淺）。點地點可以導航；按 G↗ 用 Google 地圖查這一區的店家和轉乘。</p>
     <div class="chips" id="filters">
       <button data-f="all" aria-pressed="true">全部</button>
@@ -1116,13 +1297,14 @@ nav button[aria-selected="true"]{color:var(--ink);font-weight:700}
   </section>
 </main>
 
-<button class="sos" id="sosBtn" aria-label="緊急求助">SOS</button>
+<div class="topbar" id="topbar"><span class="tt" id="tbTitle">現在</span><button class="sos" id="sosBtn" aria-label="緊急求助">SOS</button></div>
 
 <nav role="tablist">
-  <button role="tab" aria-selected="true" data-tab="now"><i>◉</i>現在</button>
-  <button role="tab" aria-selected="false" data-tab="explore"><i>⌖</i>地圖</button>
-  <button role="tab" aria-selected="false" data-tab="tr"><i>文</i>翻譯</button>
-  <button role="tab" aria-selected="false" data-tab="me"><i>☰</i>我的</button>
+  <button role="tab" aria-selected="true" data-tab="now"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg>現在</button>
+  <button role="tab" aria-selected="false" data-tab="trip"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h7"/></svg>行程</button>
+  <button role="tab" aria-selected="false" data-tab="explore"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>地圖</button>
+  <button role="tab" aria-selected="false" data-tab="tr"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h9M8.5 3v2M11 5c0 3-2 6-6 8M6 5c0 4 3 7 6 8"/><path d="M13 21l4-9 4 9M14.5 18h5"/></svg>翻譯</button>
+  <button role="tab" aria-selected="false" data-tab="me"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>我的</button>
 </nav>
 
 <div class="sheet" id="sosSheet" role="dialog" aria-modal="true" aria-label="緊急求助">
@@ -1178,6 +1360,82 @@ nav button[aria-selected="true"]{color:var(--ink);font-weight:700}
     <div class="chips" id="tgCities"></div>
     <div id="tgBody"></div>
     <button class="big close" id="tgClose" style="margin-top:16px">關閉</button>
+  </div>
+</div>
+
+
+<div class="sheet" id="addSheet" role="dialog" aria-modal="true" aria-label="加入景點">
+  <div class="box">
+    <h2 id="addTitle">加入景點</h2>
+    <form id="addForm" class="row">
+      <input id="addQ" type="search" placeholder="搜尋地點，例如 Casa Batlló" autocomplete="off" aria-label="搜尋地點">
+      <button class="btn" type="submit">搜尋</button>
+    </form>
+    <div class="btnrow"><button class="btn ghost" id="addPick" type="button">在地圖上選</button><button class="btn ghost" id="addFree" type="button">只用這個名稱加入</button></div>
+    <div class="res" id="addRes"></div>
+    <h3>推薦與住宿</h3>
+    <div class="res" id="addRec"></div>
+    <p class="hint">搜尋使用 OpenStreetMap 的地點資料，需要網路。</p>
+    <button class="big close" id="addClose">完成</button>
+  </div>
+</div>
+
+<div class="sheet" id="stopSheet" role="dialog" aria-modal="true" aria-label="編輯景點">
+  <div class="box">
+    <h2>編輯景點</h2>
+    <div class="form">
+      <label for="spName">名稱</label><input id="spName">
+      <div class="two">
+        <div><label for="spTime">時間</label><input id="spTime" type="time"></div>
+        <div><label for="spMove">放在哪一天</label><select id="spMove"></select></div>
+      </div>
+      <label for="spNote">備註</label><input id="spNote" placeholder="例如：已預約 09:15 入場">
+    </div>
+    <div id="spGoWrap"><h3>去下一站</h3>
+      <div class="seg" id="spGo"><button data-go="auto">自動</button><button data-go="walk">步行</button><button data-go="transit">搭車</button><button data-go="taxi">計程車</button></div>
+    </div>
+    <div class="btnrow"><button class="btn ghost" id="spUp">上移</button><button class="btn ghost" id="spDown">下移</button></div>
+    <div class="btnrow"><a class="btn ghost" id="spNav" target="_blank" rel="noopener">導航過去</a><button class="btn ghost" id="spMap">在地圖看</button></div>
+    <div class="btnrow"><button class="btn" id="spSave">儲存</button><button class="btn warn" id="spDel">刪除</button></div>
+    <button class="big close" id="spClose">關閉</button>
+  </div>
+</div>
+
+<div class="sheet" id="daySheet" role="dialog" aria-modal="true" aria-label="本日設定">
+  <div class="box">
+    <h2>本日設定</h2>
+    <div class="form">
+      <label for="dsDate">日期</label><input id="dsDate" type="date">
+      <label for="dsCity">城市</label><select id="dsCity"></select>
+    </div>
+    <p class="hint">城市決定推薦清單、危險區提醒和地鐵建議用哪一個城市的資料。</p>
+    <div class="btnrow"><button class="btn" id="dsSave">儲存</button><button class="btn warn" id="dsDel">刪除這一天</button></div>
+    <button class="big close" id="dsClose">關閉</button>
+  </div>
+</div>
+
+<div class="sheet" id="shareSheet" role="dialog" aria-modal="true" aria-label="分享或匯入行程">
+  <div class="box">
+    <h2>分享／匯入行程</h2>
+    <div class="form"><label for="shTitle">行程名稱</label>
+      <div class="row"><input id="shTitle" maxlength="40"><button class="btn" id="shTitleSave" type="button">改名</button></div></div>
+    <div class="btnrow"><button class="btn" id="shSend">分享給朋友</button><button class="btn ghost" id="shCopy">複製連結</button></div>
+    <p class="hint">朋友打開連結後可以匯入到自己的手機，之後各自修改，不會互相同步。</p>
+    <h3>匯入朋友的行程</h3>
+    <textarea id="shPaste" rows="3" placeholder="貼上朋友傳來的行程連結"></textarea>
+    <div class="btnrow"><button class="btn" id="shImport">匯入</button></div>
+    <button class="big close" id="shClose">關閉</button>
+  </div>
+</div>
+
+<div class="sheet" id="importSheet" role="dialog" aria-modal="true" aria-label="匯入行程">
+  <div class="box">
+    <h2>收到一份行程</h2>
+    <p id="impInfo" style="margin:0 0 6px;line-height:1.6"></p>
+    <p class="hint" id="impNote" style="color:var(--orange)">你現在是在 Safari 裡。主畫面 App 的資料和 Safari 分開：要匯入到主畫面 App，請按「複製匯入連結」，再到主畫面 App 的「行程 → 分享／匯入」貼上。</p>
+    <div class="btnrow"><button class="btn" id="impAppend">加到我的行程後面</button><button class="btn ghost" id="impReplace">取代我的行程</button></div>
+    <div class="btnrow"><button class="btn ghost" id="impCopy">複製匯入連結</button></div>
+    <button class="big close" id="impCancel">取消</button>
   </div>
 </div>
 
@@ -1411,6 +1669,9 @@ function go(tab){
   document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-selected", b.dataset.tab===tab));
   window.scrollTo(0,0);
   if(tab==="explore") renderExplore();
+  if(tab==="trip") renderTrip();
+  {const tt=document.getElementById("tbTitle");if(tt)tt.textContent=({now:"現在",trip:"行程",explore:"地圖",tr:"翻譯",me:"我的"})[tab]||"";const tb=document.getElementById("topbar");if(tb)tb.classList.remove("solid");}
+  if(tab==="now"&&typeof renderToday==="function") renderToday();
 }
 document.querySelector("nav").addEventListener("click", e=>{const t=e.target.closest("button")?.dataset.tab; if(t) go(t);});
 document.addEventListener("click", e=>{const g=e.target.closest("[data-goto]"); if(g) go(g.dataset.goto);});
@@ -1491,8 +1752,9 @@ function renderExplore(){
     const badge = x.z ? `<span class="badge ${LV[zoneLv(x.z)][1]}">${isNight()?"夜間":"白天"}${LV[zoneLv(x.z)][0]}</span>` : "";
     return `<article class="item ${x.t}"><h3>${esc(x.n)}${badge}</h3><div class="meta">${fmt(x.m)}</div>
       <p>${esc(x.d)}</p><div class="acts"><a href="${mapsLink(x.p)}" target="_blank" rel="noopener">導航</a>
-      <button data-fav="${esc(k)}">${f?"★ 已收藏":"☆ 收藏"}</button></div></article>`;
+      <button data-fav="${esc(k)}">${f?"★ 已收藏":"☆ 收藏"}</button>${x.t!=="danger"?`<button data-addtrip="${esc(x.n)}">＋ 行程</button>`:""}</div></article>`;
   }).join("");
+  if(typeof renderMetroBar==="function") renderMetroBar();
 }
 /* ---------- map (local projection in metres around city centre) ---------- */
 let view={x:0,y:0,w:3200}, viewCity=null, picked=null;
@@ -1576,6 +1838,7 @@ function renderLeaflet(){
     }
     LMcity=city; LMlv=lvKey;
   }
+  if(typeof renderOverlays==="function"){renderOverlays();hookMapPick();}
   if(pos&&dist(pos,C.c)<30000){
     if(!LMme){LMme={acc:L.circle(pos,{radius:pos.acc||30,color:"#1E3F99",weight:1,fillOpacity:.12,interactive:false}).addTo(LM),
       dot:L.circleMarker(pos,{radius:8,color:"#fff",weight:3,fillColor:"#1E3F99",fillOpacity:1}).bindTooltip("你").addTo(LM)};}
@@ -2085,7 +2348,7 @@ renderPacks();
 
 /* ---- in-app browser block ---- */
 if(INAPP && !IS_FRAMED) $("#inapp").classList.add("on");
-$("#inappCopy").addEventListener("click",async()=>{const u=location.href.split("?")[0].split("#")[0];
+$("#inappCopy").addEventListener("click",async()=>{const u=/#trip=/.test(location.hash)?location.href:location.href.split("?")[0].split("#")[0];
   try{await navigator.clipboard.writeText(u);toast("網址已複製，到 Safari 貼上");}catch(e){prompt("複製這個網址到 Safari：",u);}});
 $("#inappSkip").addEventListener("click",()=>$("#inapp").classList.remove("on"));
 
@@ -2139,6 +2402,456 @@ if(!IS_FRAMED && !INAPP && !ls.get("ss_ob_done",false)){
   if(navigator.permissions&&navigator.permissions.query){navigator.permissions.query({name:"geolocation"}).then(r=>{if(r.state==="granted"){obLocOk=true;renderOb();}}).catch(()=>{});}
   renderOb(); $("#ob").classList.add("on");
 }
+
+
+/* ================= v3: trip planner + metro layer ================= */
+const TAB_NAMES={now:"現在",trip:"行程",explore:"地圖",tr:"翻譯",me:"我的"};
+function syncTopbar(){const tb=$("#topbar");if(!tb)return;tb.classList.toggle("solid",window.scrollY>36);}
+window.addEventListener("scroll",syncTopbar,{passive:true});
+document.querySelector("nav").addEventListener("click",e=>{const t=e.target.closest("button")?.dataset.tab;if(t){$("#tbTitle").textContent=TAB_NAMES[t]||"";syncTopbar();}});
+const DAY_COLORS=["#D6006E","#0078BF","#1E9E5A","#7B4FD1","#E0671E","#008C8C","#B8860B"];
+const WK="日一二三四五六";
+const OFFICIAL_MAPS={
+  "巴塞隆納":"https://www.tmb.cat/en/barcelona-transport/map/metro",
+  "馬德里":"https://www.esmadrid.com/plano-de-metro-de-madrid",
+  "塞維亞":"https://www.metro-sevilla.es/",
+  "格拉納達":"https://metropolitanogranada.es/mapa",
+  "瓦倫西亞":"https://www.metrovalencia.es/"
+};
+const ICO={
+  warn:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg>',
+  walk:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="13" cy="4" r="2"/><path d="M9 21l2-6-2-3 1-4 4 2 3 2"/><path d="M12 15l3 6"/></svg>',
+  train:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3" width="12" height="14" rx="3"/><path d="M6 11h12M9 21l-2-3M15 21l2-3"/></svg>',
+  car:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 16V11l2-5h10l2 5v5"/><path d="M3 16h18v3H3z"/><circle cx="7.5" cy="16" r="1"/><circle cx="16.5" cy="16" r="1"/></svg>'
+};
+
+/* ---- trip state ---- */
+let trip=ls.get("ss_trip",null);
+if(!trip||!Array.isArray(trip.days)) trip={v:1,title:"我的西班牙行程",days:[]};
+let dayIdx=Math.min(ls.get("ss_trip_day",0),Math.max(0,trip.days.length-1));
+let editStop=null, pickMode=null;
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const saveTrip=()=>{ls.set("ss_trip",trip);ls.set("ss_trip_day",dayIdx);};
+const dayColor=i=>(trip.days[i]&&trip.days[i].color)||DAY_COLORS[i%DAY_COLORS.length];
+const curDay=()=>trip.days[dayIdx]||null;
+function dateLabel(d){if(!d)return"";const x=new Date(d+"T12:00:00");if(isNaN(x))return d;return `${x.getMonth()+1}/${x.getDate()} 週${WK[x.getDay()]}`;}
+function shortDate(d){if(!d)return"";const x=new Date(d+"T12:00:00");return isNaN(x)?d:`${x.getMonth()+1}/${x.getDate()}`;}
+function addDays(d,n){const x=new Date(d+"T12:00:00");x.setDate(x.getDate()+n);return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`;}
+function hourOf(t){const m=/^(\d{1,2}):(\d{2})/.exec(t||"");return m?+m[1]:null;}
+function zoneLvAt(z,t){const h=hourOf(t);if(h==null)return zoneLv(z);return (h>=21||h<6)?z.night:z.day;}
+function stopDanger(s,cityName){
+  if(!s.p||!CITIES[cityName])return null;
+  let best=null;
+  for(const z of CITIES[cityName].zones){const d=dist(s.p,z.p);if(d<=z.r+60){const lv=zoneLvAt(z,s.t);if(lv>0&&(!best||lv>best.lv))best={z,lv};}}
+  return best;
+}
+function sortStops(day){
+  // keep manual order, but stops with time are sorted among themselves when user asks
+  day.stops.sort((a,b)=>{if(!a.t&&!b.t)return 0;if(!a.t)return 1;if(!b.t)return-1;return a.t.localeCompare(b.t);});
+}
+
+/* ---- metro data ---- */
+const METRO={};       // key -> {lines, stations:[{n,p,lines:[idx]}]}
+const transitLoading={};
+function cityKey(c){return (PACKS[c]||{}).key;}
+async function loadTransit(c){
+  const k=cityKey(c); if(!k) return null;
+  if(METRO[k]) return METRO[k];
+  if(transitLoading[k]) return transitLoading[k];
+  transitLoading[k]=(async()=>{
+    try{
+      const r=await fetch(`./transit/${k}.json`);
+      if(!r.ok) throw new Error(r.status);
+      const j=await r.json();
+      if(!j||!Array.isArray(j.lines)) throw new Error("bad");
+      // which lines serve each station (within ~90 m of a line vertex/segment)
+      const cosL=Math.cos(rad((CITIES[c]||{c:[40,0]}).c[0]));
+      const segD=(p,a,b)=>{const ax=(a[1]-p[1])*cosL,ay=a[0]-p[0],bx=(b[1]-p[1])*cosL,by=b[0]-p[0];
+        const dx=bx-ax,dy=by-ay,L2=dx*dx+dy*dy;let t=L2?-(ax*dx+ay*dy)/L2:0;t=Math.max(0,Math.min(1,t));
+        const x=ax+t*dx,y=ay+t*dy;return Math.sqrt(x*x+y*y)*111320;};
+      const st=(j.stations||[]).map(s=>{
+        const lines=[];
+        j.lines.forEach((ln,i)=>{
+          for(const seg of ln.segs){let hit=false;for(let q=1;q<seg.length;q++){if(segD(s.p,seg[q-1],seg[q])<90){hit=true;break;}}if(hit){lines.push(i);break;}}
+        });
+        return {n:s.n,p:s.p,lines};
+      });
+      METRO[k]={lines:j.lines,stations:st,source:j.source||"© OpenStreetMap"};
+    }catch(e){METRO[k]=null;}
+    delete transitLoading[k];
+    return METRO[k];
+  })();
+  return transitLoading[k];
+}
+function nearestStation(T,p,maxM=700){
+  if(!T||!p) return null;
+  let best=null,bd=Infinity;
+  for(const s of T.stations){if(!s.lines.length)continue;const d=dist(p,s.p);if(d<bd){bd=d;best=s;}}
+  return bd<=maxM?{s:best,d:bd}:null;
+}
+function nearStations(T,p,maxM=800,k=4){
+  const out=[];for(const s of T.stations){if(!s.lines.length)continue;const d=dist(p,s.p);if(d<=maxM)out.push({s,d});}
+  return out.sort((x,y)=>x.d-y.d).slice(0,k);
+}
+function metroHint(T,a,b){
+  const As=nearStations(T,a), Bs=nearStations(T,b);
+  if(!As.length||!Bs.length) return null;
+  let best=null;
+  for(const A of As)for(const B of Bs){
+    if(A.s===B.s) continue;
+    const common=A.s.lines.filter(i=>B.s.lines.includes(i));
+    if(common.length){const sc=A.d+B.d;if(!best||sc<best.sc)best={sc,ln:T.lines[common[0]],from:A.s.n,to:B.s.n,direct:true};}
+  }
+  if(best) return best;
+  const A=As[0],B=Bs[0]; if(A.s===B.s) return null;
+  return {ln:T.lines[A.s.lines[0]],ln2:T.lines[B.s.lines[0]],from:A.s.n,to:B.s.n,direct:false};
+}
+const lineBadge=ln=>`<span class="lb" style="background:${esc(ln.colour||"#555")}">${esc(ln.ref)}</span>`;
+
+/* ---- trip view ---- */
+function legInfo(a,b,cityName){
+  if(!a.p||!b.p) return {mode:"none",html:`<span>沒有位置，無法估算交通</span>`};
+  const d=dist(a.p,b.p), walkMin=Math.max(1,Math.round(d*1.3/80));
+  const mode=a.go&&a.go!=="auto"?a.go:(d<1200?"walk":"transit");
+  const gdir=(tm)=>`https://www.google.com/maps/dir/?api=1&origin=${a.p[0]},${a.p[1]}&destination=${b.p[0]},${b.p[1]}&travelmode=${tm}`;
+  if(mode==="walk") return {mode,html:`${ICO.walk}<span>步行約 ${walkMin} 分・${fmt(d*1.3)}</span><a href="${gdir("walking")}" target="_blank" rel="noopener">路線</a>`};
+  if(mode==="taxi"){const m=Math.max(5,Math.round(d*1.4/1000/22*60));return {mode,html:`${ICO.car}<span>計程車約 ${m} 分</span><button data-ride>叫車</button>`};}
+  const T=METRO[cityKey(cityName)];
+  const h=T?metroHint(T,a.p,b.p):null;
+  let txt=`<span>大眾運輸・直線 ${fmt(d)}</span>`;
+  if(h&&h.direct) txt=`${lineBadge(h.ln)}<span>${esc(h.from)} → ${esc(h.to)}（估計）</span>`;
+  else if(h) txt=`${lineBadge(h.ln)}${lineBadge(h.ln2)}<span>${esc(h.from)} → ${esc(h.to)}，需轉乘（估計）</span>`;
+  return {mode:"transit",html:`${ICO.train}${txt}<a href="${gdir("transit")}" target="_blank" rel="noopener">查路線</a>`};
+}
+function stripSvg(day,color){
+  const pts=day.stops.filter(s=>s.p);
+  if(pts.length<1) return "";
+  const C=CITIES[day.city];
+  let la=pts.map(s=>s.p[0]),lo=pts.map(s=>s.p[1]);
+  let minA=Math.min(...la),maxA=Math.max(...la),minO=Math.min(...lo),maxO=Math.max(...lo);
+  const cos=Math.cos(rad(minA));
+  let w=(maxO-minO)*cos,h=maxA-minA; const pad=Math.max(w,h,0.004)*0.22+0.0018;
+  minO-=pad/cos;maxO+=pad/cos;minA-=pad;maxA+=pad;
+  const W=350,H=120; w=(maxO-minO)*cos;h=maxA-minA;
+  const sc=Math.min(W/w,H/h), ox=(W-w*sc)/2, oy=(H-h*sc)/2;
+  const X=p=>ox+(p[1]-minO)*cos*sc, Y=p=>oy+(maxA-p[0])*sc;
+  const zones=(C?C.zones:[]).map(z=>{const lv=zoneLv(z);if(!lv)return"";const r=z.r/111320*sc;
+    return `<circle cx="${X(z.p).toFixed(1)}" cy="${Y(z.p).toFixed(1)}" r="${r.toFixed(1)}" fill="#D62828" fill-opacity=".14" stroke="#D62828" stroke-width="1.2"/>`;}).join("");
+  const line=pts.map(s=>`${X(s.p).toFixed(1)},${Y(s.p).toFixed(1)}`).join(" ");
+  const nums=day.stops.map((s,i)=>s.p?`<circle cx="${X(s.p).toFixed(1)}" cy="${Y(s.p).toFixed(1)}" r="10" fill="${color}"/><text x="${X(s.p).toFixed(1)}" y="${(Y(s.p)+4).toFixed(1)}" font-size="11" font-weight="900" fill="#fff" text-anchor="middle">${i+1}</text>`:"").join("");
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="這天的路線縮圖">${zones}<polyline points="${line}" fill="none" stroke="${color}" stroke-width="3" stroke-dasharray="2 6" stroke-linecap="round"/>${nums}</svg>`;
+}
+function renderTrip(){
+  const box=$("#tripBody"); if(!box) return;
+  const v=$("#v-trip");
+  if(!trip.days.length){
+    $("#tripHead").innerHTML=`<div class="tr-sub">${esc(trip.title)}</div><div class="tr-title"><h1>行程</h1></div>`;
+    $("#tripDays").innerHTML=""; $("#tripTools").innerHTML="";
+    box.innerHTML=`<div class="tr-empty"><b>還沒有行程</b>先建立第一天，再把景點加進去。每段移動時間、會經過的危險區、可以搭的地鐵線都會自動算出來。<div class="btnrow" style="justify-content:center"><button class="btn" id="trFirst" style="flex:none;min-width:160px">建立第一天</button><button class="btn ghost" data-trshare style="flex:none;min-width:160px">匯入朋友的行程</button></div></div>`;
+    $("#trAdd").style.display="none"; return;
+  }
+  dayIdx=Math.min(dayIdx,trip.days.length-1);
+  const day=curDay(), color=dayColor(dayIdx);
+  v.style.setProperty("--dc",color);
+  const first=trip.days[0].date, last=trip.days[trip.days.length-1].date;
+  const cities=[...new Set(trip.days.map(d=>d.city))].join("・");
+  $("#tripHead").innerHTML=`<div class="tr-sub">${esc(cities)}${first?`・${shortDate(first)}–${shortDate(last)}`:""}</div>
+    <div class="tr-title"><h1>第 ${dayIdx+1} 天</h1><span>${esc(dateLabel(day.date))}${day.date?"・":""}${esc(day.city)}</span></div>`;
+  $("#tripDays").innerHTML=trip.days.map((d,i)=>`<button data-day="${i}" aria-pressed="${i===dayIdx}" style="--dc:${dayColor(i)}">D${i+1}${d.date?" "+shortDate(d.date):""}</button>`).join("")+`<button class="add" id="trNewDay" aria-label="新增一天">+</button>`;
+  $("#tripTools").innerHTML=`<button id="trDaySet">本日設定</button><button id="trSort">依時間排序</button><button id="trOnMap">在地圖看</button><button data-trshare>分享／匯入</button>`;
+  $("#trAdd").style.display="";
+  if(!day.stops.length){
+    box.innerHTML=`<div class="tr-empty"><b>這天還沒有景點</b>按下方「加入景點」，從推薦清單、搜尋或地圖上選。</div>`;
+    return;
+  }
+  const withP=day.stops.filter(s=>s.p);
+  let walkM=0, legs=0;
+  for(let i=0;i<day.stops.length-1;i++){const a=day.stops[i],b=day.stops[i+1];if(a.p&&b.p){const d=dist(a.p,b.p);const m=a.go&&a.go!=="auto"?a.go:(d<1200?"walk":"transit");if(m==="walk")walkM+=d*1.3;else legs++;}}
+  const strip=withP.length?`<div class="strip"><div class="sum">${day.stops.length} 站・步行 ${fmt(walkM)}${legs?`・搭車 ${legs} 段`:""}</div>${stripSvg(day,color)}</div>`:"";
+  const n=day.stops.length;
+  let h=`<div class="tl">`;
+  day.stops.forEach((s,i)=>{
+    const dz=stopDanger(s,day.city);
+    const pos2=n===1?"only":i===0?"first":i===n-1?"last":"";
+    const nextMode=i<n-1?legInfo(s,day.stops[i+1],day.city):null;
+    h+=`<div class="t${s.t?"":" empty"}">${s.t?esc(s.t):"未定"}</div>
+      <div class="rail ${pos2}${nextMode&&nextMode.mode!=="transit"&&nextMode.mode!=="taxi"?" "+(nextMode.mode==="none"?"none":"walk"):""}"><div class="dot${dz&&dz.lv>=2?" d2":""}"></div></div>
+      <div><button class="stopbtn" data-stop="${i}"><b>${esc(s.n)}</b>${s.note?`<small>${esc(s.note)}</small>`:""}${!s.p?`<small>沒有位置（只能當備忘）</small>`:""}
+        ${dz?`<span class="warnbox${dz.lv<2?" l1":""}">${ICO.warn}<span>${esc(dz.z.n)}：${esc(dz.z.tip)}</span></span>`:""}</button></div>`;
+    if(nextMode){
+      h+=`<div></div><div class="rail ${nextMode.mode==="walk"?"walk":nextMode.mode==="none"?"none":""}"></div><div class="leg">${nextMode.html}</div>`;
+    }
+  });
+  h+=`</div>`;
+  const T=METRO[cityKey(day.city)];
+  box.innerHTML=strip+h+(T===undefined&&cityKey(day.city)?`<p class="hint">地鐵建議載入中…</p>`:"")+`<p class="hint">步行時間以直線距離估算；地鐵站與路線是依附近車站推測，實際請按「查路線」用 Google 地圖確認。</p>`;
+  if(T===undefined&&cityKey(day.city)) loadTransit(day.city).then(()=>{if($("#v-trip").classList.contains("on"))renderTrip();});
+}
+function newDay(){
+  const prev=trip.days[trip.days.length-1];
+  let date=prev&&prev.date?addDays(prev.date,1):"";
+  const st=(typeof stays!=="undefined"?stays:[]).filter(s=>s.ci).sort((a,b)=>a.ci.localeCompare(b.ci));
+  if(!date&&st.length) date=st[0].ci;
+  let c=prev?prev.city:(pos?nearestCity(pos)[0]:city);
+  if(date&&st.length){const s=st.find(s=>s.ci<=date&&(!s.co||date<s.co));if(s&&s.lat!=null){c=nearestCity([s.lat,s.lng])[0];}}
+  trip.days.push({id:uid(),date,city:c,stops:[]});
+  dayIdx=trip.days.length-1; saveTrip(); renderTrip(); renderToday();
+}
+function addStopToDay(st,idx=dayIdx){
+  if(!trip.days.length){newDay();idx=0;}
+  const day=trip.days[idx];
+  day.stops.push({id:uid(),n:st.n,p:st.p?[+(+st.p[0]).toFixed(5),+(+st.p[1]).toFixed(5)]:null,t:st.t||"",note:st.note||"",k:st.k||"custom",go:"auto"});
+  saveTrip();
+}
+
+/* ---- add sheet ---- */
+function openAdd(){
+  if(!trip.days.length) newDay();
+  const day=curDay();
+  $("#addTitle").textContent=`加入到第 ${dayIdx+1} 天・${day.city}`;
+  $("#addQ").value=""; $("#addRes").innerHTML="";
+  const C=CITIES[day.city];
+  const st=(typeof stays!=="undefined"?stays:[]).filter(s=>s.lat!=null);
+  const rows=[...st.map(s=>({n:s.name||"住宿",p:[s.lat,s.lng],k:"stay",d:"我的住宿"})),
+    ...(C?C.places:[]).map(p=>({n:p.n,p:p.p,k:p.t,d:p.d}))];
+  $("#addRec").innerHTML=rows.map((r,i)=>`<button data-rec="${i}"><span><b>${esc(r.n)}</b><small>${esc(r.d||"")}</small></span><i>+</i></button>`).join("")||`<p class="hint">這個城市沒有推薦清單。</p>`;
+  $("#addRec")._rows=rows;
+  $("#addSheet").classList.add("on");
+}
+async function searchPlaces(q){
+  const day=curDay(), C=CITIES[day.city];
+  const out=$("#addRes");
+  if(!navigator.onLine){out.innerHTML=`<p class="hint">搜尋需要網路。沒網路時可以從推薦清單加入，或只填名稱。</p>`;return;}
+  out.innerHTML=`<p class="hint">搜尋中…</p>`;
+  try{
+    const c=C?C.c:[40.4,-3.7], vb=[c[1]-0.15,c[0]+0.12,c[1]+0.15,c[0]-0.12].join(",");
+    const u=`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=8&countrycodes=es&accept-language=zh-TW,es&viewbox=${vb}&q=${encodeURIComponent(q)}`;
+    const r=await fetch(u,{headers:{"Accept":"application/json"}});
+    if(!r.ok) throw new Error(r.status);
+    const j=await r.json();
+    const rows=j.map(x=>({n:x.name||x.display_name.split(",")[0],p:[+x.lat,+x.lon],k:"custom",d:x.display_name}));
+    out._rows=rows;
+    out.innerHTML=rows.length?rows.map((r,i)=>`<button data-res="${i}"><span><b>${esc(r.n)}</b><small>${esc(r.d)}${C?`・距市中心 ${fmt(dist(C.c,r.p))}`:""}</small></span><i>+</i></button>`).join(""):`<p class="hint">找不到「${esc(q)}」。試試西文或英文名稱，或改用「在地圖上選」。</p>`;
+  }catch(e){out.innerHTML=`<p class="hint">搜尋失敗，請稍後再試。</p>`;}
+}
+
+/* ---- stop sheet ---- */
+function openStop(i){
+  const day=curDay(); const s=day.stops[i]; if(!s) return;
+  editStop=i;
+  $("#spName").value=s.n; $("#spTime").value=s.t||""; $("#spNote").value=s.note||"";
+  document.querySelectorAll("#spGo button").forEach(b=>b.setAttribute("aria-pressed",(s.go||"auto")===b.dataset.go));
+  $("#spGoWrap").style.display=i<day.stops.length-1?"":"none";
+  $("#spMove").innerHTML=trip.days.map((d,k)=>`<option value="${k}"${k===dayIdx?" selected":""}>第 ${k+1} 天${d.date?" "+shortDate(d.date):""}・${esc(d.city)}</option>`).join("");
+  const nav=$("#spNav");
+  if(s.p){nav.style.display="";nav.href=`https://www.google.com/maps/dir/?api=1&destination=${s.p[0]},${s.p[1]}&travelmode=walking`;}
+  else nav.style.display="none";
+  $("#spMap").style.display=s.p?"":"none";
+  $("#spUp").disabled=i===0; $("#spDown").disabled=i===day.stops.length-1;
+  $("#stopSheet").classList.add("on");
+}
+function closeStop(){ $("#stopSheet").classList.remove("on"); editStop=null; }
+
+/* ---- share / import ---- */
+const b64u={enc:u8=>{let s="";for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");},
+  dec:str=>{str=str.replace(/-/g,"+").replace(/_/g,"/");while(str.length%4)str+="=";const b=atob(str),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}};
+async function packTrip(){
+  const data={v:1,t:trip.title,d:trip.days.map(d=>[d.date||"",d.city,d.stops.map(s=>[s.n,s.p||0,s.t||"",s.note||"",s.k||"",s.go||"auto"])])};
+  const raw=new TextEncoder().encode(JSON.stringify(data));
+  if(typeof CompressionStream!=="undefined"){
+    try{const cs=new Blob([raw]).stream().pipeThrough(new CompressionStream("deflate-raw"));
+      const buf=new Uint8Array(await new Response(cs).arrayBuffer());return "z."+b64u.enc(buf);}catch(e){}
+  }
+  return "j."+b64u.enc(raw);
+}
+async function unpackTrip(code){
+  code=String(code||"").trim();
+  const m=/[#&]trip=([^&\s]+)/.exec(code); if(m) code=m[1];
+  const [kind,body]=[code.slice(0,2),code.slice(2)];
+  let bytes=b64u.dec(body);
+  if(kind==="z."){const ds=new Blob([bytes]).stream().pipeThrough(new DecompressionStream("deflate-raw"));bytes=new Uint8Array(await new Response(ds).arrayBuffer());}
+  else if(kind!=="j.") throw new Error("格式不對");
+  const d=JSON.parse(new TextDecoder().decode(bytes));
+  if(!d||d.v!==1||!Array.isArray(d.d)) throw new Error("格式不對");
+  return {title:String(d.t||"朋友的行程").slice(0,60),days:d.d.slice(0,60).map(x=>({id:uid(),date:/^\d{4}-\d{2}-\d{2}$/.test(x[0])?x[0]:"",city:CITIES[x[1]]?x[1]:Object.keys(CITIES)[0],
+    stops:(Array.isArray(x[2])?x[2]:[]).slice(0,80).map(s=>({id:uid(),n:String(s[0]||"景點").slice(0,80),p:Array.isArray(s[1])&&isFinite(s[1][0])&&isFinite(s[1][1])?[+s[1][0],+s[1][1]]:null,
+      t:/^\d{1,2}:\d{2}$/.test(s[2])?s[2]:"",note:String(s[3]||"").slice(0,200),k:String(s[4]||"custom").slice(0,10),go:["auto","walk","transit","taxi"].includes(s[5])?s[5]:"auto"}))}))};
+}
+let pendingImport=null;
+function showImport(t){
+  pendingImport=t;
+  const n=t.days.reduce((a,d)=>a+d.stops.length,0);
+  $("#impInfo").innerHTML=`<b style="font-size:18px">${esc(t.title)}</b><br>${t.days.length} 天、${n} 個景點：${esc([...new Set(t.days.map(d=>d.city))].join("、"))}`;
+  $("#impNote").style.display=(!STANDALONE&&!IS_FRAMED)?"":"none";
+  $("#importSheet").classList.add("on");
+}
+
+/* ---- today card on 現在 ---- */
+function renderToday(){
+  const box=$("#tripToday"); if(!box) return;
+  const t=todayStr(); const i=trip.days.findIndex(d=>d.date===t);
+  if(i<0||!trip.days[i].stops.length){box.innerHTML="";return;}
+  const d=trip.days[i], now=new Date(), hm=`${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+  const next=d.stops.find(s=>s.t&&s.t>=hm)||d.stops.find(s=>!s.t);
+  box.innerHTML=`<div class="today" style="--dc:${dayColor(i)}"><span class="tdot"></span><div><small>今天・第 ${i+1} 天${next?"・下一站 "+esc(next.t||""):"・今天的景點都過了"}</small><b>${esc(next?next.n:d.stops[d.stops.length-1].n)}</b></div><button data-today="${i}">看行程</button></div>`;
+}
+
+/* ---- map overlays: trip + metro ---- */
+let LMtrip=null, LMmetro=null, metroHidden=new Set(ls.get("ss_metro_off",[])), metroOn=ls.get("ss_metro_on",true), tripOn=ls.get("ss_trip_on",true);
+function renderOverlays(){
+  if(!LM) return;
+  // trip
+  if(LMtrip){LMtrip.remove();LMtrip=null;}
+  if(tripOn){
+    let di=trip.days[dayIdx]&&trip.days[dayIdx].city===city?dayIdx:trip.days.findIndex(d=>d.city===city);
+    if(di>=0){
+      const d=trip.days[di], col=dayColor(di), pts=[];
+      LMtrip=L.layerGroup();
+      d.stops.forEach((s,i)=>{if(!s.p)return;pts.push(s.p);
+        L.marker(s.p,{icon:L.divIcon({className:"",html:`<div class="trip-pin" style="background:${col}">${i+1}</div>`,iconSize:[24,24],iconAnchor:[12,12]}),zIndexOffset:1000})
+          .bindPopup(`<b>${i+1}. ${esc(s.n)}</b>${s.t?"<br>"+esc(s.t):""}${s.note?"<br>"+esc(s.note):""}`).addTo(LMtrip);});
+      if(pts.length>1) L.polyline(pts,{color:col,weight:3,dashArray:"2 8",lineCap:"round",interactive:false}).addTo(LMtrip);
+      LMtrip.addTo(LM);
+    }
+  }
+  // metro
+  if(LMmetro){LMmetro.remove();LMmetro=null;}
+  const k=cityKey(city), T=k?METRO[k]:null;
+  if(k&&METRO[k]===undefined){loadTransit(city).then(()=>{renderOverlays();renderMetroBar();});}
+  if(metroOn&&T){
+    LMmetro=L.layerGroup();
+    T.lines.forEach((ln,i)=>{if(metroHidden.has(ln.ref))return;
+      ln.segs.forEach(seg=>L.polyline(seg,{color:ln.colour||"#555",weight:5,opacity:.85,interactive:false}).addTo(LMmetro));});
+    T.stations.forEach(s=>{
+      const vis=s.lines.filter(i=>!metroHidden.has(T.lines[i].ref));if(!vis.length)return;
+      L.circleMarker(s.p,{radius:4.5,color:"#111827",weight:2,fillColor:"#fff",fillOpacity:1})
+        .bindTooltip(`${esc(s.n)} ${vis.map(i=>esc(T.lines[i].ref)).join("・")}`,{direction:"top",offset:[0,-4]}).addTo(LMmetro);});
+    LMmetro.addTo(LM);
+    if(LMlayer) LMlayer.eachLayer(l=>{if(l.bringToFront)l.bringToFront();});
+    if(LMtrip) LMtrip.eachLayer(l=>{if(l.bringToFront)l.bringToFront();});
+  }
+}
+function renderMetroBar(){
+  const box=$("#metro"); if(!box) return;
+  const k=cityKey(city), T=k?METRO[k]:undefined;
+  let chips=`<button class="trip" data-mtrip aria-pressed="${tripOn}">行程</button>`;
+  if(T&&T.lines.length){
+    chips+=`<button class="all" data-mall aria-pressed="${metroOn}">地鐵</button>`;
+    if(metroOn) chips+=T.lines.map(ln=>`<button data-mline="${esc(ln.ref)}" style="--lc:${esc(ln.colour||"#555")}" aria-pressed="${!metroHidden.has(ln.ref)}">${esc(ln.ref)}</button>`).join("");
+  }
+  const note=T===undefined&&k?"地鐵路線載入中…":T?`地鐵路線依地理位置繪製，外觀和官方示意圖不同。點車站看站名。資料 ${esc(T.source)}。`:"這個城市的地鐵路線資料還沒放上網站。";
+  box.innerHTML=`<div class="chips">${chips}</div><p class="hint">${note}</p>${OFFICIAL_MAPS[city]?`<a class="btn ghost" href="${OFFICIAL_MAPS[city]}" target="_blank" rel="noopener">官方路線圖（${esc(city)}）</a>`:""}`;
+}
+
+/* ---- events ---- */
+document.addEventListener("click",e=>{
+  const t=e.target;
+  if(t.closest("#trFirst")){newDay();return;}
+  if(t.closest("#trNewDay")){newDay();toast("已新增一天");return;}
+  const dbtn=t.closest("[data-day]"); if(dbtn){dayIdx=+dbtn.dataset.day;saveTrip();renderTrip();return;}
+  if(t.closest("#trAdd")){openAdd();return;}
+  const sb=t.closest("[data-stop]"); if(sb){openStop(+sb.dataset.stop);return;}
+  if(t.closest("[data-ride]")){$("#rideSheet").classList.add("on");return;}
+  if(t.closest("#trSort")){const d=curDay();if(d){sortStops(d);saveTrip();renderTrip();toast("已依時間排序，沒填時間的放最後");}return;}
+  if(t.closest("#trOnMap")){const d=curDay();if(d){city=d.city;tripOn=true;ls.set("ss_trip_on",true);go("explore");
+      setTimeout(()=>{if(LM&&$("#mapwrap").classList.contains("leaf")){const ps=d.stops.filter(s=>s.p).map(s=>s.p);if(ps.length>1)LM.fitBounds(ps,{padding:[30,30]});else if(ps.length)LM.setView(ps[0],16);}},350);}return;}
+  if(t.closest("#trDaySet")){const d=curDay();if(!d)return;$("#dsDate").value=d.date||"";$("#dsCity").innerHTML=Object.keys(CITIES).map(c=>`<option${c===d.city?" selected":""}>${c}</option>`).join("");$("#daySheet").classList.add("on");return;}
+  if(t.closest("[data-trshare]")){$("#shPaste").value="";$("#shTitle").value=trip.title;$("#shareSheet").classList.add("on");return;}
+  const td=t.closest("[data-today]"); if(td){dayIdx=+td.dataset.today;saveTrip();go("trip");return;}
+  const at=t.closest("[data-addtrip]");
+  if(at){const it=CITIES[city].places.find(p=>p.n===at.dataset.addtrip);if(!it)return;
+    if(!trip.days.length){newDay();trip.days[0].city=city;}
+    let idx=curDay()&&curDay().city===city?dayIdx:trip.days.findIndex(d=>d.city===city);
+    if(idx<0){toast(`行程裡沒有${city}的日子，先在「行程」新增一天並設定城市`);return;}
+    addStopToDay({n:it.n,p:it.p,k:it.t},idx);renderOverlays();toast(`已加入第 ${idx+1} 天`);return;}
+  // map bar
+  if(t.closest("[data-mtrip]")){tripOn=!tripOn;ls.set("ss_trip_on",tripOn);renderOverlays();renderMetroBar();return;}
+  if(t.closest("[data-mall]")){metroOn=!metroOn;ls.set("ss_metro_on",metroOn);renderOverlays();renderMetroBar();return;}
+  const ml=t.closest("[data-mline]");
+  if(ml){const r=ml.dataset.mline;metroHidden.has(r)?metroHidden.delete(r):metroHidden.add(r);ls.set("ss_metro_off",[...metroHidden]);renderOverlays();renderMetroBar();return;}
+  if(t.closest("#pickCancel")){pickMode=null;$("#pickBar").classList.remove("on");return;}
+});
+// add sheet
+$("#addClose").addEventListener("click",()=>$("#addSheet").classList.remove("on"));
+$("#addSheet").addEventListener("click",e=>{
+  if(e.target.id==="addSheet"){e.currentTarget.classList.remove("on");return;}
+  const r=e.target.closest("[data-rec]"); if(r){const row=$("#addRec")._rows[+r.dataset.rec];addStopToDay(row);toast(`已加入：${row.n}`);r.disabled=true;r.style.opacity=.5;renderTrip();return;}
+  const s=e.target.closest("[data-res]"); if(s){const row=$("#addRes")._rows[+s.dataset.res];addStopToDay(row);toast(`已加入：${row.n}`);s.disabled=true;s.style.opacity=.5;renderTrip();return;}
+});
+$("#addForm").addEventListener("submit",e=>{e.preventDefault();const q=$("#addQ").value.trim();if(q)searchPlaces(q);});
+$("#addFree").addEventListener("click",()=>{const n=$("#addQ").value.trim();if(!n){toast("先在上面的欄位輸入名稱");$("#addQ").focus();return;}addStopToDay({n,p:null});toast(`已加入：${n}（沒有位置）`);renderTrip();});
+$("#addPick").addEventListener("click",()=>{
+  if(FRAMED||!window.L){toast("需要街道地圖才能在地圖上選位置");return;}
+  pickMode={day:dayIdx};$("#addSheet").classList.remove("on");city=curDay().city;go("explore");
+  $("#pickBar").classList.add("on");$("#pickText").textContent=`點地圖選位置，加入第 ${dayIdx+1} 天`;
+});
+// stop sheet
+$("#spGo").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;document.querySelectorAll("#spGo button").forEach(x=>x.setAttribute("aria-pressed",x===b));});
+$("#spSave").addEventListener("click",()=>{
+  const d=curDay(), s=d&&d.stops[editStop]; if(!s) return;
+  s.n=$("#spName").value.trim()||s.n; s.t=$("#spTime").value||""; s.note=$("#spNote").value.trim();
+  const g=document.querySelector('#spGo button[aria-pressed="true"]'); s.go=g?g.dataset.go:"auto";
+  const to=+$("#spMove").value;
+  if(to!==dayIdx){d.stops.splice(editStop,1);trip.days[to].stops.push(s);toast(`已移到第 ${to+1} 天`);}
+  saveTrip(); closeStop(); renderTrip(); renderToday();
+});
+$("#spUp").addEventListener("click",()=>{const d=curDay();const i=editStop;if(i>0){[d.stops[i-1],d.stops[i]]=[d.stops[i],d.stops[i-1]];saveTrip();closeStop();renderTrip();}});
+$("#spDown").addEventListener("click",()=>{const d=curDay();const i=editStop;if(i<d.stops.length-1){[d.stops[i+1],d.stops[i]]=[d.stops[i],d.stops[i+1]];saveTrip();closeStop();renderTrip();}});
+$("#spDel").addEventListener("click",()=>{const d=curDay();if(!confirm("從行程刪除這個景點？"))return;d.stops.splice(editStop,1);saveTrip();closeStop();renderTrip();renderToday();});
+$("#spMap").addEventListener("click",()=>{const d=curDay(),s=d.stops[editStop];closeStop();city=d.city;tripOn=true;go("explore");setTimeout(()=>{if(LM&&s.p)LM.setView(s.p,17);},350);});
+$("#spClose").addEventListener("click",closeStop);
+$("#stopSheet").addEventListener("click",e=>{if(e.target.id==="stopSheet")closeStop();});
+// day sheet
+$("#dsSave").addEventListener("click",()=>{const d=curDay();d.date=$("#dsDate").value||"";d.city=$("#dsCity").value;saveTrip();$("#daySheet").classList.remove("on");renderTrip();renderToday();});
+$("#dsDel").addEventListener("click",()=>{if(!confirm("刪除這一天和裡面所有景點？"))return;trip.days.splice(dayIdx,1);dayIdx=Math.max(0,dayIdx-1);saveTrip();$("#daySheet").classList.remove("on");renderTrip();renderToday();});
+$("#dsClose").addEventListener("click",()=>$("#daySheet").classList.remove("on"));
+// share sheet
+$("#shSend").addEventListener("click",async()=>{
+  if(!trip.days.length){toast("還沒有行程可以分享");return;}
+  const url=location.origin+location.pathname+"#trip="+await packTrip();
+  const text=`我的西班牙行程「${trip.title}」，用「西班牙獨旅」打開就能匯入：`;
+  if(navigator.share){try{await navigator.share({title:trip.title,text,url});return;}catch(err){if(err.name==="AbortError")return;}}
+  try{await navigator.clipboard.writeText(text+"\n"+url);toast("連結已複製，貼到 LINE 傳給朋友");}catch(err){prompt("複製這個連結：",url);}
+});
+$("#shCopy").addEventListener("click",async()=>{
+  if(!trip.days.length){toast("還沒有行程可以分享");return;}
+  const url=location.origin+location.pathname+"#trip="+await packTrip();
+  try{await navigator.clipboard.writeText(url);toast("行程連結已複製");}catch(err){prompt("複製這個連結：",url);}
+});
+$("#shImport").addEventListener("click",async()=>{
+  try{const t=await unpackTrip($("#shPaste").value);$("#shareSheet").classList.remove("on");showImport(t);}
+  catch(err){toast("看不懂這段內容，請貼上完整的行程連結");}
+});
+$("#shTitleSave").addEventListener("click",()=>{const v=$("#shTitle").value.trim();if(v){trip.title=v.slice(0,40);saveTrip();renderTrip();toast("已更新行程名稱");}});
+$("#shClose").addEventListener("click",()=>$("#shareSheet").classList.remove("on"));
+// import sheet
+function finishImport(mode){
+  const t=pendingImport; if(!t) return;
+  if(mode==="replace"){if(trip.days.length&&!confirm("取代後，你目前的行程會被刪除。確定？"))return;trip={v:1,title:t.title,days:t.days};dayIdx=0;}
+  else {trip.days.push(...t.days);dayIdx=trip.days.length-t.days.length;}
+  saveTrip(); pendingImport=null; $("#importSheet").classList.remove("on");
+  try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}
+  go("trip"); toast("行程已匯入"); renderToday();
+}
+$("#impReplace").addEventListener("click",()=>finishImport("replace"));
+$("#impAppend").addEventListener("click",()=>finishImport("append"));
+$("#impCopy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(location.href);toast("已複製，到主畫面 App 的「行程 → 分享／匯入」貼上");}catch(e){prompt("複製這段：",location.href);}});
+$("#impCancel").addEventListener("click",()=>{pendingImport=null;$("#importSheet").classList.remove("on");try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}});
+// map pick: Leaflet click
+function hookMapPick(){
+  if(!LM||LM._pickHooked) return; LM._pickHooked=true;
+  LM.on("click",e=>{
+    if(!pickMode) return;
+    const n=prompt("這個地點叫什麼？","自訂地點"); if(n===null) return;
+    addStopToDay({n:n.trim()||"自訂地點",p:[e.latlng.lat,e.latlng.lng]},pickMode.day);
+    const di=pickMode.day; pickMode=null; $("#pickBar").classList.remove("on");
+    dayIdx=di; saveTrip(); renderOverlays(); toast(`已加入第 ${di+1} 天`); go("trip");
+  });
+}
+// boot
+window.addEventListener("hashchange",()=>{if(/#trip=/.test(location.hash))unpackTrip(location.hash).then(showImport).catch(()=>toast("行程連結不完整"));});
+if(/#trip=/.test(location.hash)) unpackTrip(location.hash).then(showImport).catch(()=>toast("行程連結不完整，請朋友重新分享"));
+renderTrip(); renderToday();
 
 </script>
 </body>
