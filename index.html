@@ -1184,6 +1184,16 @@ nav button[aria-selected="true"] svg{stroke-width:2.4}
   <section class="view" id="v-me">
     <h1>我的</h1>
 
+    <h2 style="margin-top:4px">使用說明書</h2>
+    <div class="panel" id="guideCard">
+      <p class="hint" style="margin:0">每個功能怎麼用、出事時怎麼辦，10 頁 PDF（約 1.5 MB）。建議出發前先存到手機，沒網路也能看。</p>
+      <div class="btnrow">
+        <a class="btn" id="guideOpen" href="./guide.pdf" target="_blank" rel="noopener">打開說明書</a>
+        <button class="btn ghost" id="guideSave" type="button">存到手機</button>
+      </div>
+      <p class="hint" id="guideMsg" style="margin:8px 0 0"></p>
+    </div>
+
     <h2 style="margin-top:4px">我的住宿</h2>
     <div class="panel">
       <p class="hint" style="margin:0 0 10px">依入住日期自動切換，「現在」只顯示今晚那一間。</p>
@@ -2853,6 +2863,34 @@ window.addEventListener("hashchange",()=>{if(/#trip=/.test(location.hash))unpack
 if(/#trip=/.test(location.hash)) unpackTrip(location.hash).then(showImport).catch(()=>toast("行程連結不完整，請朋友重新分享"));
 renderTrip(); renderToday();
 
+
+/* ===== 使用說明書 ===== */
+(function(){
+  const save=$("#guideSave"), msg=$("#guideMsg");
+  if(!save) return;
+  const NAME="西班牙獨旅-使用說明書.pdf";
+  async function getPdf(){
+    const r=await fetch("./guide.pdf");
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    return new File([await r.blob()],NAME,{type:"application/pdf"});
+  }
+  save.addEventListener("click",async()=>{
+    msg.textContent="準備中…";
+    let f;
+    try{ f=await getPdf(); }
+    catch(e){ msg.textContent="現在拿不到說明書（沒網路且還沒存過），連上網路再試一次。"; return; }
+    if(navigator.canShare&&navigator.canShare({files:[f]})){
+      try{ await navigator.share({files:[f],title:"西班牙獨旅 使用說明書"});
+        msg.textContent="在分享選單選「儲存到檔案」或「圖書」，之後沒網路也能打開。"; }
+      catch(e){ msg.textContent=e&&e.name==="AbortError"?"":"分享失敗，改用「打開說明書」再按分享鍵儲存。"; }
+      return;
+    }
+    const u=URL.createObjectURL(f), a=document.createElement("a");
+    a.href=u; a.download=NAME; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(u),30000);
+    msg.textContent="已下載。";
+  });
+})();
 </script>
 </body>
 </html>

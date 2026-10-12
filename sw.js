@@ -2,12 +2,12 @@
    - App 本體：網路優先（有網路就拿新版），沒網路用快取
    - 地圖圖磚：只快取「看過的」圖磚（不預先大量下載，符合 OSM 使用規範），背景更新
    - 字型：快取後背景更新 */
-const SHELL_CACHE = "ss-shell-v4";
+const SHELL_CACHE = "ss-shell-v5";
 const TILE_CACHE = "ss-tiles";
 const FONT_CACHE = "ss-fonts";
 const MAP_CACHE = "ss-maps"; // 使用者手動下載的城市離線地圖，由頁面管理
 const TILE_LIMIT = 3000;
-const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./icon-192.png", "./icon-512.png",
+const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./icon-192.png", "./icon-512.png", "./guide.pdf",
   "./transit/barcelona.json", "./transit/madrid.json", "./transit/sevilla.json", "./transit/granada.json", "./transit/valencia.json"];
 
 self.addEventListener("install", (e) => {
@@ -78,8 +78,8 @@ self.addEventListener("fetch", (e) => {
     return;
   }
 
-  // 地鐵路線資料：有網路拿新的並存起來，沒網路用存的
-  if (url.origin === self.location.origin && url.pathname.includes("/transit/")) {
+  // 地鐵路線資料、說明書：有網路拿新的並存起來，沒網路用存的
+  if (url.origin === self.location.origin && (url.pathname.includes("/transit/") || url.pathname.endsWith("/guide.pdf"))) {
     e.respondWith((async () => {
       const c = await caches.open(SHELL_CACHE);
       try { const res = await fetch(req); if (res.ok) c.put(req, res.clone()); return res; }
