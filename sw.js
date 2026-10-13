@@ -2,7 +2,7 @@
    - App 本體：網路優先（有網路就拿新版），沒網路用快取
    - 地圖圖磚：只快取「看過的」圖磚（不預先大量下載，符合 OSM 使用規範），背景更新
    - 字型：快取後背景更新 */
-const SHELL_CACHE = "ss-shell-v5";
+const SHELL_CACHE = "ss-shell-v6";
 const TILE_CACHE = "ss-tiles";
 const FONT_CACHE = "ss-fonts";
 const MAP_CACHE = "ss-maps"; // 使用者手動下載的城市離線地圖，由頁面管理
@@ -57,7 +57,9 @@ self.addEventListener("fetch", (e) => {
   if (req.mode === "navigate") {
     e.respondWith((async () => {
       try {
-        const res = await fetch(req);
+        // no-cache：每次都跟 GitHub Pages 確認有沒有新版（沒變只回 304，很省流量），避開它 10 分鐘的 HTTP 快取
+        let res = await fetch(req.url, { cache: "no-cache", credentials: "same-origin" });
+        if (res.redirected) res = await fetch(req); // Safari 不接受 SW 回傳轉址過的導覽回應
         const c = await caches.open(SHELL_CACHE);
         c.put("./index.html", res.clone());
         return res;
@@ -82,7 +84,7 @@ self.addEventListener("fetch", (e) => {
   if (url.origin === self.location.origin && (url.pathname.includes("/transit/") || url.pathname.endsWith("/guide.pdf"))) {
     e.respondWith((async () => {
       const c = await caches.open(SHELL_CACHE);
-      try { const res = await fetch(req); if (res.ok) c.put(req, res.clone()); return res; }
+      try { const res = await fetch(req, { cache: "no-cache" }); if (res.ok) c.put(req, res.clone()); return res; }
       catch (err) { return (await c.match(req)) || new Response("", { status: 504 }); }
     })());
     return;
