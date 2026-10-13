@@ -1075,6 +1075,157 @@ nav button[aria-selected="true"] svg{stroke-width:2.4}
 .metro a.btn{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;margin-top:10px;width:100%;min-height:44px}
 .trip-pin{width:24px;height:24px;border-radius:50%;color:#fff;font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);font-family:"Noto Sans TC",sans-serif}
 
+
+/* ===== v3.1 路線圖風延伸到每一頁 ===== */
+#v-now{--tc:#43B02A}#v-trip{--tc:#D6006E}#v-explore{--tc:#0072CE}#v-tr{--tc:#F2A900}#v-me{--tc:#93328E}
+nav button[data-tab="now"]{--tc:#43B02A}nav button[data-tab="trip"]{--tc:#D6006E}nav button[data-tab="explore"]{--tc:#0072CE}nav button[data-tab="tr"]{--tc:#F2A900}nav button[data-tab="me"]{--tc:#93328E}
+/* 頁首：標題下方一段路線色 */
+.view>h1{margin-bottom:18px}
+.view>h1::after{content:"";display:block;width:64px;height:6px;border-radius:3px;background:var(--tc);margin-top:10px}
+/* 小標題 = 車站 */
+.view>h2{display:flex;align-items:center;gap:10px}
+.view>h2::before{content:"";flex:none;width:18px;height:18px;border-radius:50%;box-sizing:border-box;border:5px solid var(--tc);background:var(--bg)}
+/* 分頁列：選中的分頁頂端亮出路線色 */
+nav button{position:relative}
+nav button[aria-selected="true"]::before{content:"";position:absolute;top:-1px;left:26%;right:26%;height:4px;border-radius:0 0 4px 4px;background:var(--tc)}
+/* 現在：狀態卡 = 一段路線 + 目前這一站 */
+.status{position:relative;padding:18px 18px 16px 54px;min-height:0}
+.status::before{content:"";position:absolute;left:22px;top:0;bottom:0;width:6px;background:var(--sc)}
+.status::after{content:"";position:absolute;left:13px;top:22px;width:24px;height:24px;border-radius:50%;box-sizing:border-box;border:6px solid var(--sc);background:var(--sbg)}
+.status{overflow:hidden}
+.sx{--sc:var(--line)}
+.sx::before{background:repeating-linear-gradient(var(--muted) 0 6px,transparent 6px 12px);opacity:.5}
+.sx::after{border-color:var(--muted)}
+.sx .lv{color:var(--ink);font-size:30px}
+.status .where{font-size:16px}
+.status .tip{font-size:14.5px;color:var(--ink);opacity:.85}
+.status .big{margin-top:14px}
+/* 快速功能：路線牌圖示 */
+.quick a,.quick button{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:10px;align-items:center;background:var(--card);box-shadow:inset 0 0 0 2px var(--line)}
+.quick .qi{grid-row:1/3;width:34px;height:34px;border-radius:9px;background:var(--qc);display:flex;align-items:center;justify-content:center}
+.quick .qi svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.quick b{align-self:end}.quick span{align-self:start}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .quick .qi[style*="#111827"]{background:#3A4250}}
+:root[data-theme="dark"] .quick .qi[style*="#111827"]{background:#3A4250}
+/* 列表上的小圓點改成車站環 */
+.item h3::before{width:12px;height:12px;box-sizing:border-box;border:3.5px solid var(--c);background:transparent}
+/* 地圖：城市切換用目前分頁的路線色 */
+#cities button[aria-pressed="true"]{background:var(--tc);border-color:var(--tc);color:#fff}
+/* 翻譯：選中的方向與字卡 */
+.dir button[aria-pressed="true"]{box-shadow:inset 0 -4px 0 var(--tc)}
+.phr button{border-left:6px solid var(--tc);border-radius:6px 14px 14px 6px}
+#trOut{background:var(--soft);border-left:6px solid var(--tc);border-radius:6px 14px 14px 6px}
+/* 我的：區塊左側掛在路線上 */
+#v-me .panel{border-left:6px solid var(--tc);border-radius:6px 16px 16px 6px}
+
+/* ===== v3.2 精修：站牌／對話卡／我的路線／全螢幕地圖 ===== */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .qi[style*="#111827"]{background:#3A4250!important}}
+:root[data-theme="dark"] .qi[style*="#111827"]{background:#3A4250!important}
+.sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+/* 拿掉 v3.1 左側色條 */
+#v-me .panel,.phr button,#trOut{border-left:0}
+#v-me .panel{border-radius:16px}
+/* --- 現在：站牌 --- */
+.nowlbl{min-height:42px;display:flex;align-items:center;margin-right:96px;font-size:14px;font-weight:700;color:var(--muted)}
+.sign{position:relative;margin:6px 0 12px;border-radius:16px;background:#111827;color:#fff;padding:22px 18px 14px;overflow:hidden}
+.sign::before{content:"";position:absolute;left:0;right:0;top:0;height:8px;background:var(--tc)}
+.sign .nm{font-size:38px;font-weight:900;letter-spacing:1px;line-height:1.1}
+.sign .la{font-size:17px;font-weight:700;color:#C9CFDA;letter-spacing:.5px;margin-top:2px}
+.sign svg{display:block;width:100%;height:auto;margin-top:14px}
+.sign svg[hidden]{display:none}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .sign{background:#1E2633}}
+:root[data-theme="dark"] .sign{background:#1E2633}
+/* --- 翻譯：對話卡 --- */
+.trcard{border-radius:20px;background:var(--soft);overflow:hidden;padding-bottom:6px}
+.trlang{display:flex;align-items:center;padding:12px 14px 0;font-size:14px;font-weight:900}
+.trlang .sp{flex:1}
+#dir[hidden]{display:none}
+#trSwap{margin:0 10px;width:36px;height:36px;border-radius:50%;border:0;background:var(--card);display:flex;align-items:center;justify-content:center}
+#trMic{width:44px;height:44px;border-radius:50%;border:0;background:var(--ink);display:flex;align-items:center;justify-content:center}
+#trSwap svg,#trMic svg{width:19px;height:19px;fill:none;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
+#trSwap svg{stroke:var(--ink)}#trMic svg{stroke:var(--bg)}
+.trcard #trIn{display:block;width:100%;box-sizing:border-box;min-height:84px;border:0;background:transparent;padding:8px 14px;font-size:18px;resize:none;border-radius:0}
+.trcard #trIn:focus-visible{outline-offset:-3px}
+.trcard>.trrow{margin:4px 6px 0}
+.trcard>.trrow>*{min-height:46px;display:flex;align-items:center;justify-content:center}
+.trres{margin:6px 6px 0;border-radius:16px;background:var(--card);padding:14px;box-shadow:0 1px 4px rgba(17,24,39,.08)}
+.trres:has(#trOut:empty){display:none}
+.trtag{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;color:var(--muted)}
+.trtag span{width:14px;height:14px;border-radius:50%;box-sizing:border-box;border:4px solid var(--tc)}
+.trres #trOut{background:none;padding:0;margin-top:8px;font-size:25px;font-weight:900;border-radius:0;min-height:0}
+.trres .trrow{margin-top:12px}
+.view>h2 small{font-size:12.5px;font-weight:700;color:var(--muted)}
+#phrCat{margin-bottom:10px}
+.phr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.phr button{border-radius:14px;min-height:92px;display:flex;flex-direction:column;gap:4px;align-items:flex-start;justify-content:flex-start;padding:12px}
+.phr b{font-size:15.5px;font-weight:900;line-height:1.35}
+.phr span{font-size:13px;line-height:1.4}
+/* --- 我的：一條線三站 --- */
+.meline{position:relative;padding-left:34px;margin-top:4px}
+.meline::before{content:"";position:absolute;left:8px;top:12px;bottom:12px;width:6px;border-radius:3px;background:var(--tc)}
+.mest{position:relative;display:flex;align-items:center;gap:8px;min-height:26px;margin:20px 0 8px}
+.mest:first-child{margin-top:4px}
+.mest::before{content:"";position:absolute;left:-34px;width:22px;height:22px;border-radius:50%;box-sizing:border-box;border:6px solid var(--sc,var(--tc));background:var(--bg)}
+.mest.emg{--sc:var(--red)}
+.mest h2{margin:0;font-size:17px}
+.mest small{font-size:12.5px;font-weight:700;color:var(--muted)}
+.megrp{border-radius:16px;background:var(--soft);overflow:hidden}
+.megrp.emg{background:var(--red-soft)}
+.merow{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border:0;background:none;color:var(--ink);text-align:left;font:inherit;min-height:60px}
+.merow+.merow{border-top:1px solid var(--line)}
+.megrp.emg .merow+.merow{border-top-color:rgba(214,40,40,.18)}
+.merow .qi{flex:none;width:34px;height:34px;border-radius:9px;background:var(--qc);display:flex;align-items:center;justify-content:center}
+.merow .qi svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.merow .tx{flex:1;min-width:0}
+.merow b{display:block;font-size:16px;font-weight:900}
+.merow .tx span{display:block;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.merow>svg{flex:none;width:16px;height:16px;stroke:var(--muted);fill:none;stroke-width:2.6;stroke-linecap:round}
+.mesec{display:none}
+#v-me.detail>h1,#v-me.detail .meline{display:none}
+#v-me.detail .mesec.on{display:block}
+.meback{display:inline-flex;align-items:center;gap:4px;height:42px;padding:0 4px;margin:0 0 6px;border:0;background:none;color:var(--ink);font:inherit;font-weight:700;font-size:15px}
+.meback svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round}
+.mesec>h2:first-of-type{font-size:26px;margin-top:4px}
+.mesec>h2:first-of-type::before{display:none}
+#v-me.detail{padding-top:0}
+/* --- 地圖：全螢幕 --- */
+#v-explore{--peek:236px}
+#v-explore .mapwrap{position:fixed;left:0;right:0;top:0;bottom:calc(var(--tabh) + env(safe-area-inset-bottom,0px));border-radius:0;z-index:5}
+#v-explore #lmap,#v-explore #map{width:100%;height:100%;aspect-ratio:auto}
+#v-explore .mapctl{top:calc(124px + env(safe-area-inset-top,0px));right:12px;gap:8px}
+#v-explore .mapctl button{width:44px;height:44px;border-radius:12px;background:var(--card)}
+#v-explore .leaflet-bottom,#v-explore .scale{bottom:calc(var(--peek) + 6px)}
+#v-explore .scale{left:12px}
+.mtop{position:fixed;left:12px;top:calc(14px + env(safe-area-inset-top,0px));z-index:22}
+.citybtn{height:44px;display:flex;align-items:center;gap:10px;padding:0 14px 0 8px;border:0;border-radius:12px;background:var(--tc);color:#fff;font:inherit;box-shadow:0 2px 10px rgba(17,24,39,.2)}
+.citybtn .ring{width:28px;height:28px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center}
+.citybtn .ring i{width:12px;height:12px;border-radius:50%;border:4px solid var(--tc)}
+.citybtn b{font-size:17px;font-weight:900;letter-spacing:.5px}
+.citybtn svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round}
+.citypop{margin-top:8px;background:var(--card);border-radius:14px;box-shadow:0 6px 24px rgba(17,24,39,.2);padding:6px;min-width:190px}
+.citypop .chips{flex-direction:column;gap:2px;padding:0;overflow:visible}
+.citypop .chips button{border:0;border-radius:10px;height:44px;text-align:left;padding:0 12px;font-size:16px;color:var(--ink);background:none}
+#v-explore .citypop .chips button[aria-pressed="true"]{background:var(--soft);color:var(--ink)}
+#v-explore #metro{position:fixed;left:12px;right:68px;top:calc(68px + env(safe-area-inset-top,0px));z-index:21;margin:0;padding:0;background:none;border-radius:0}
+#v-explore #metro .hint,#v-explore #metro a.btn{display:none}
+#v-explore #metro .chips{padding:2px 2px 8px}
+#v-explore #metro .chips button{box-shadow:0 1px 6px rgba(17,24,39,.18)}
+#v-explore #metro .chips button[aria-pressed="false"]{background:var(--card);box-shadow:0 1px 6px rgba(17,24,39,.18)}
+#v-explore .pickbar{position:fixed;left:12px;right:12px;top:calc(68px + env(safe-area-inset-top,0px));z-index:23;margin:0}
+.msheet{position:fixed;left:0;right:0;bottom:calc(var(--tabh) + env(safe-area-inset-bottom,0px));z-index:16;max-width:560px;margin:0 auto;
+  background:var(--card);border-radius:20px 20px 0 0;box-shadow:0 -4px 20px rgba(17,24,39,.14);display:flex;flex-direction:column;
+  height:calc(100dvh - var(--tabh) - env(safe-area-inset-bottom,0px) - 130px - env(safe-area-inset-top,0px));transform:translateY(calc(100% - var(--peek)));transition:transform .25s ease}
+.msheet.open{transform:none}
+.msheet.drag{transition:none}
+.msh-grip{flex:none;height:26px;display:flex;align-items:center;justify-content:center;border:0;background:none;width:100%;touch-action:none;cursor:grab}
+.msh-grip i{width:40px;height:5px;border-radius:3px;background:var(--line)}
+.msh-body{flex:1;overflow-y:auto;padding:0 16px 16px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.msh-body #filters{position:sticky;top:0;background:var(--card);z-index:1;padding-bottom:8px;margin:0 -16px;padding-left:16px;padding-right:16px}
+.msh-body .pick{margin-top:4px}
+.msh-body .list{margin-top:4px}
+@media (prefers-reduced-motion:reduce){.msheet{transition:none}}
+#mhBody p{font-size:14.5px;line-height:1.6;margin:0 0 10px}
+#mhBody .btn{display:flex;align-items:center;justify-content:center;min-height:46px;margin-top:8px;text-decoration:none;width:100%;box-sizing:border-box}
 </style>
 </head>
 <body>
@@ -1082,26 +1233,32 @@ nav button[aria-selected="true"] svg{stroke-width:2.4}
   <div class="offbar" id="offbar"><b>離線中</b>・危險區判斷、字卡、證件、住宿地址卡、看過的地圖都還能用；導航、翻譯、附近搜尋要等有網路。</div>
   <!-- NOW -->
   <section class="view on" id="v-now">
-    <h1>現在</h1>
-    <div class="status sx" id="status">
-      <div class="lv" id="stLv">尚未定位</div>
-      <div class="where" id="stWhere">按下方按鈕開始</div>
-      <p class="tip" id="stTip">定位只在這個頁面開著時運作，不會上傳到任何地方。</p>
-      <div class="small" id="stSmall"></div>
+    <h1 class="sr">現在</h1>
+    <div class="nowlbl" id="signLbl">西班牙獨旅</div>
+    <div class="sign" id="sign">
+      <div class="nm" id="signNm">巴塞隆納</div>
+      <div class="la" id="signLa">Barcelona</div>
+      <svg id="signRoute" viewBox="0 0 322 62" role="img" aria-label="旅程路線"></svg>
     </div>
-    <button class="big" id="locBtn">開始定位</button>
+    <div class="status sx" id="status">
+      <div class="lv" id="stLv">附近安不安全？</div>
+      <div class="where" id="stWhere">開始定位後，靠近扒手熱區會先提醒你。</div>
+      <p class="tip" id="stTip">位置只在這個頁面開著時使用，不會上傳。</p>
+      <div class="small" id="stSmall"></div>
+      <button class="big" id="locBtn">開始定位</button>
+    </div>
     <div class="near" id="nearZone"></div>
     <div id="tripToday"></div>
     <div id="stayCard"></div>
 
     <div class="quick">
-      <a id="qPolice" href="https://www.google.com/maps/search/comisaria+policia" target="_blank" rel="noopener"><b>附近警察局</b><span>Google 地圖搜尋</span></a>
-      <a id="qPharm" href="https://www.google.com/maps/search/farmacia" target="_blank" rel="noopener"><b>附近藥局</b><span>綠色十字招牌</span></a>
-      <button id="qWc"><b>找廁所</b><span>超市、咖啡廳、博物館</span></button>
-      <button id="qRide"><b>叫車</b><span>Uber、Cabify、FreeNow</span></button>
-      <button id="qTransit" class="wide"><b>地鐵、公車怎麼搭</b><span>買票、感應、轉乘、下車，加上看得懂的站內單字</span></button>
-      <button data-share><b>傳位置給家人</b><span>LINE、訊息都可以</span></button>
-      <button data-goto="tr"><b>求助字卡</b><span>拿給當地人看</span></button>
+      <a id="qPolice" href="https://www.google.com/maps/search/comisaria+policia" target="_blank" rel="noopener"><i class="qi" style="--qc:#0072CE" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z"/></svg></i><b>附近警察局</b><span>Google 地圖搜尋</span></a>
+      <a id="qPharm" href="https://www.google.com/maps/search/farmacia" target="_blank" rel="noopener"><i class="qi" style="--qc:#1E9E5A" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></svg></i><b>附近藥局</b><span>綠色十字招牌</span></a>
+      <button id="qWc"><i class="qi" style="--qc:#5F6B7A" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="8" cy="5" r="1.6"/><circle cx="16" cy="5" r="1.6"/><path d="M8 9v11M5.5 9h5l-.5 6M16 9l-3 7h6l-3-7M16 16v4"/></svg></i><b>找廁所</b><span>超市、咖啡廳、博物館</span></button>
+      <button id="qRide"><i class="qi" style="--qc:#C98A00" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 16V11l2-5h10l2 5v5M5 16h14M7 19v-3M17 19v-3"/><circle cx="8" cy="13" r=".8"/><circle cx="16" cy="13" r=".8"/></svg></i><b>叫車</b><span>Uber、Cabify、FreeNow</span></button>
+      <button id="qTransit" class="wide"><i class="qi" style="--qc:#93328E" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="14" rx="3"/><path d="M6 11h12M9 21l1.5-4M15 21l-1.5-4"/></svg></i><b>地鐵、公車怎麼搭</b><span>買票、感應、轉乘、下車，加上看得懂的站內單字</span></button>
+      <button data-share><i class="qi" style="--qc:#D6006E" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-6-5.5-6-11a6 6 0 0 1 12 0c0 5.5-6 11-6 11z"/><circle cx="12" cy="10" r="2"/></svg></i><b>傳位置給家人</b><span>LINE、訊息都可以</span></button>
+      <button data-goto="tr"><i class="qi" style="--qc:#111827" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h6M7 14h10"/></svg></i><b>求助字卡</b><span>拿給當地人看</span></button>
     </div>
 
     <h2>最常見的 4 種偷竊手法</h2>
@@ -1124,7 +1281,11 @@ nav button[aria-selected="true"] svg{stroke-width:2.4}
 
   <!-- EXPLORE -->
   <section class="view" id="v-explore">
-    <h1>地圖</h1>
+    <h1 class="sr">地圖</h1>
+    <div class="mtop" id="mapTop">
+      <button type="button" class="citybtn" id="cityBtn" aria-haspopup="true" aria-expanded="false"><span class="ring"><i></i></span><b id="cityNm">巴塞隆納</b><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="citypop" id="cityPop" hidden></div>
+    </div>
     <div class="pickbar" id="pickBar"><span id="pickText">點地圖選位置</span><button id="pickCancel">取消</button></div>
     <div class="chips" id="cities"></div>
     <div class="mapwrap" id="mapwrap">
@@ -1135,6 +1296,7 @@ nav button[aria-selected="true"] svg{stroke-width:2.4}
         <button id="zOut" aria-label="縮小">−</button>
         <button id="zMe" aria-label="回到我的位置">◎</button>
         <button id="zG" aria-label="在 Google 地圖打開這一區" style="font-size:15px;color:#1A73E8">G↗</button>
+        <button id="zHelp" aria-label="說明：紅圈和路線的意思">?</button>
       </div>
       <div class="scale" id="scale"></div>
     </div>
@@ -1159,24 +1321,43 @@ nav button[aria-selected="true"] svg{stroke-width:2.4}
   <!-- TRANSLATE -->
   <section class="view" id="v-tr">
     <h1>翻譯</h1>
-    <div class="dir" id="dir">
-      <button data-d="zh2es" aria-pressed="true">中文 → 西文</button>
-      <button data-d="es2zh" aria-pressed="false">西文 → 中文</button>
-    </div>
-    <textarea id="trIn" placeholder="輸入或按鍵盤上的麥克風用說的"></textarea>
-    <div class="trrow">
-      <button class="btn" id="trGo">翻譯</button>
-      <a class="btn ghost" id="trG" href="https://translate.google.com/" target="_blank" rel="noopener">用 Google 翻譯</a>
+    <div class="trcard">
+      <div class="trlang">
+        <span id="trFrom">中文</span>
+        <button type="button" id="trSwap" aria-label="對調語言"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h14l-3-3M20 16H6l3 3"/></svg></button>
+        <span id="trTo">Español</span>
+        <span class="sp"></span>
+        <button type="button" id="trMic" aria-label="用說的"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+      </div>
+      <div class="dir" id="dir" hidden>
+        <button data-d="zh2es" aria-pressed="true">中文 → 西文</button>
+        <button data-d="es2zh" aria-pressed="false">西文 → 中文</button>
+      </div>
+      <label class="sr" for="trIn">要翻譯的文字</label>
+      <textarea id="trIn" placeholder="輸入或按鍵盤上的麥克風用說的"></textarea>
+      <div class="trrow">
+        <button class="btn" id="trGo">翻譯</button>
+        <a class="btn" id="trG" href="https://translate.google.com/" target="_blank" rel="noopener">用 Google 翻譯</a>
+      </div>
+      <div class="trres">
+        <div class="trtag"><span></span>給對方看</div>
+        <div id="trOut" aria-live="polite"></div>
+        <div class="trrow" id="trActs" style="display:none">
+          <button class="btn ghost" id="trSay">朗讀</button>
+          <button class="btn" id="trFull">全螢幕給對方看</button>
+        </div>
+      </div>
     </div>
     <p class="hint" id="trNote"></p>
-    <div id="trOut" aria-live="polite"></div>
-    <div class="trrow" id="trActs" style="display:none">
-      <button class="btn ghost" id="trSay">朗讀</button>
-      <button class="btn ghost" id="trFull">全螢幕給對方看</button>
-    </div>
-    <p class="hint">看菜單、標示：用 iPhone 內建「翻譯」App 的相機功能，先在 App 裡下載西班牙文，沒網路也能用。</p>
+    <p class="hint">菜單、路標：用 iPhone「翻譯」App 的相機，先下載西班牙文就能離線用。</p>
 
-    <h2>求助字卡（離線可用）</h2>
+    <h2>求助字卡<small>沒網路也能用</small></h2>
+    <div class="chips" id="phrCat">
+      <button data-pc="all" aria-pressed="true">全部</button>
+      <button data-pc="help" aria-pressed="false">求助</button>
+      <button data-pc="go" aria-pressed="false">問路・交通</button>
+      <button data-pc="eat" aria-pressed="false">吃飯・廁所</button>
+    </div>
     <div class="phr" id="phrases"></div>
   </section>
 
@@ -1316,6 +1497,14 @@ nav button[aria-selected="true"] svg{stroke-width:2.4}
   <button role="tab" aria-selected="false" data-tab="tr"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h9M8.5 3v2M11 5c0 3-2 6-6 8M6 5c0 4 3 7 6 8"/><path d="M13 21l4-9 4 9M14.5 18h5"/></svg>翻譯</button>
   <button role="tab" aria-selected="false" data-tab="me"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>我的</button>
 </nav>
+
+<div class="sheet" id="mapHelp" role="dialog" aria-modal="true" aria-label="地圖說明">
+  <div class="box">
+    <h2>地圖怎麼看</h2>
+    <div id="mhBody"></div>
+    <button class="big close" id="mhClose">關閉</button>
+  </div>
+</div>
 
 <div class="sheet" id="sosSheet" role="dialog" aria-modal="true" aria-label="緊急求助">
   <div class="box">
@@ -2890,6 +3079,161 @@ renderTrip(); renderToday();
     setTimeout(()=>URL.revokeObjectURL(u),30000);
     msg.textContent="已下載。";
   });
+})();
+
+/* ===== v3.2 ===== */
+(function(){
+const LATIN={"巴塞隆納":"Barcelona","馬德里":"Madrid","塞維亞":"Sevilla","格拉納達":"Granada","瓦倫西亞":"Valencia"};
+
+/* ---- 現在：站牌 ---- */
+function tripRoute(){const r=[];(trip.days||[]).forEach((d,i)=>{if(!d.city)return;const l=r[r.length-1];if(!l||l.c!==d.city)r.push({c:d.city,date:d.date,i});});return r;}
+function renderSign(){
+  if(!$("#sign")) return;
+  const t=todayStr(), ti=(trip.days||[]).findIndex(d=>d.date===t);
+  let lbl, c;
+  if(ti>=0&&trip.days[ti].city){lbl=`今天在・旅程第 ${ti+1} 天`;c=trip.days[ti].city;}
+  else if(pos){const [nc,nd]=nearestCity(pos);if(nd<30000){lbl="你現在在";c=nc;}else{lbl="不在收錄城市・最近的是";c=nc;}}
+  else{const up=(trip.days||[]).find(d=>d.date&&d.date>t&&d.city);
+    if(up){lbl=`下一站・${shortDate(up.date)} 出發`;c=up.city;}else{lbl="地圖上正在看";c=city;}}
+  $("#signLbl").textContent=lbl; $("#signNm").textContent=c; $("#signLa").textContent=LATIN[c]||"";
+  const r=tripRoute(), svg=$("#signRoute");
+  if(r.length<2){svg.setAttribute("hidden","");svg.innerHTML="";return;}
+  svg.removeAttribute("hidden");
+  let cur=-1;
+  if(ti>=0){for(let k=0;k<r.length;k++) if(r[k].i<=ti) cur=k;}
+  else cur=r.findIndex(x=>x.c===c);
+  const n=r.length, W=322, x0=12, x1=W-12, X=k=>x0+k*(x1-x0)/(n-1), fs=n>5?11:12, G="#43B02A";
+  let h=`<path d="M${x0} 16H${x1}" stroke="#3A4250" stroke-width="6" stroke-linecap="round"/>`;
+  if(cur>0) h+=`<path d="M${x0} 16H${X(cur)}" stroke="${G}" stroke-width="6" stroke-linecap="round"/>`;
+  r.forEach((s,k)=>{const x=X(k), anc=k===0?"start":k===n-1?"end":"middle", tx=k===0?x0+2:k===n-1?x1+2:x;
+    if(k===cur) h+=`<circle cx="${x}" cy="16" r="10" fill="${G}"/><circle cx="${x}" cy="16" r="4" fill="#111827"/>`;
+    else if(k<cur) h+=`<circle cx="${x}" cy="16" r="7" fill="${G}"/>`;
+    else h+=`<circle cx="${x}" cy="16" r="7" fill="#111827" stroke="#C9CFDA" stroke-width="3"/>`;
+    h+=`<text x="${tx}" y="44" text-anchor="${anc}" font-size="${fs}" font-weight="700" fill="${k===cur?"#FFFFFF":"#C9CFDA"}" font-family="Noto Sans TC,sans-serif">${esc(s.c)}</text>`;
+    if(s.date) h+=`<text x="${tx}" y="59" text-anchor="${anc}" font-size="11" fill="#8A94A6" font-family="Noto Sans TC,sans-serif">${esc(shortDate(s.date))}</text>`;});
+  svg.innerHTML=h;
+  svg.setAttribute("aria-label","旅程路線："+r.map(x=>x.c).join("、")+(cur>=0?`，目前在第 ${cur+1} 站`:""));
+}
+const _rt=renderToday; renderToday=function(){_rt.apply(this,arguments);try{renderSign();}catch(e){}};
+const _rs=renderStatus; renderStatus=function(){_rs.apply(this,arguments);try{renderSign();}catch(e){}};
+renderSign();
+
+/* ---- 翻譯 ---- */
+function trLabels(){const zh=($("#dir button[data-d=zh2es]").getAttribute("aria-pressed")==="true");
+  $("#trFrom").textContent=zh?"中文":"Español"; $("#trTo").textContent=zh?"Español":"中文";}
+$("#trSwap").addEventListener("click",()=>{const b=document.querySelector('#dir button[aria-pressed="false"]');if(b)b.click();trLabels();});
+$("#trMic").addEventListener("click",()=>{$("#trIn").focus();toast("按鍵盤上的麥克風就能用說的");});
+trLabels();
+const PCAT=["help","help","help","help","go","help","eat","eat","eat","go","go","go","go","help"];
+let phrCat="all";
+function renderPhr(){
+  $("#phrases").innerHTML=PHRASES.map((p,i)=>[p,i]).filter(([p,i])=>phrCat==="all"||PCAT[i]===phrCat)
+    .map(([p,i])=>`<button data-card="${i}" aria-label="${esc(p[1])}，點開放大給對方看"><b>${esc(p[1])}</b><span>${esc(p[0])}</span></button>`).join("");
+}
+$("#phrCat").addEventListener("click",e=>{const b=e.target.closest("[data-pc]");if(!b)return;phrCat=b.dataset.pc;
+  document.querySelectorAll("#phrCat button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderPhr();});
+renderPhr();
+
+/* ---- 我的：一條線三站 ---- */
+const me=$("#v-me"), secs={};
+(function wrap(){
+  const kids=[...me.children]; let cur=null;
+  const KEY={"使用說明書":"guide","我的住宿":"stay","緊急聯絡人":"ec","付款怎麼準備":"pay","離線使用":"off","東西被偷了怎麼辦":"lost","出發前備份清單":"prep","掛失電話記事":"notes","證件備份（加密）":"vault"};
+  kids.forEach(el=>{
+    if(el.tagName==="H1") return;
+    if(el.tagName==="H2"){const k=KEY[el.textContent.trim()]||("s"+Object.keys(secs).length);
+      cur=document.createElement("div");cur.className="mesec";cur.dataset.k=k;secs[k]=cur;
+      cur.innerHTML=`<button type="button" class="meback" data-meback><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>我的</button>`;
+      el.style.marginTop="0"; me.insertBefore(cur,el);}
+    if(cur) cur.appendChild(el);
+  });
+})();
+const IC={
+ stay:['#43B02A','<path d="M3 21V10l9-6 9 6v11M9 21v-6h6v6"/>'],
+ prep:['#0072CE','<path d="M9 5h10M9 12h10M9 19h10M4 5l1 1 2-2M4 12l1 1 2-2M4 19l1 1 2-2"/>'],
+ vault:['#111827','<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>'],
+ off:['#5F6B7A','<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'],
+ pay:['#C98A00','<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 15h3"/>'],
+ guide:['#93328E','<path d="M6 3h9l3 3v15H6z"/><path d="M9 11h6M9 15h6"/>'],
+ ec:['#D62828','<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>'],
+ lost:['#D62828','<path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2M10 13l4 4M14 13l-4 4"/>'],
+ notes:['#D62828','<path d="M5 4h14v16H5z"/><path d="M8 9h8M8 13h8M8 17h5"/>'],
+};
+const TITLE={stay:"我的住宿",prep:"出發前備份清單",vault:"證件備份",off:"離線地圖",pay:"付款怎麼準備",guide:"使用說明書",ec:"緊急聯絡人",lost:"東西被偷了怎麼辦",notes:"掛失電話記事"};
+const STA=[["出發前",["stay","prep","vault","off","pay"],""],["旅途中",["guide"],""],["出事時",["ec","lost","notes"],"emg"]];
+const line=document.createElement("div"); line.className="meline";
+line.innerHTML=STA.map(([nm,ks,cls])=>`<div class="mest ${cls}"><h2>${nm}</h2><small id="mest-${nm}"></small></div><div class="megrp ${cls}">`+
+  ks.filter(k=>secs[k]).map(k=>`<button type="button" class="merow" data-meopen="${k}"><i class="qi" style="--qc:${IC[k][0]}" aria-hidden="true"><svg viewBox="0 0 24 24">${IC[k][1]}</svg></i><span class="tx"><b>${TITLE[k]}</b><span id="mes-${k}"></span></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>`).join("")+`</div>`).join("");
+me.querySelector("h1").after(line);
+function meSum(){
+  const set=(k,v)=>{const el=$("#mes-"+k);if(el)el.textContent=v;};
+  try{const [cur]=pickStay();set("stay",stays.length?`${stays.length} 間${cur?"・今晚 "+(cur.name||""):""}`:"還沒設定，迷路時一鍵回飯店");}catch(e){}
+  const cb=[...document.querySelectorAll("#prep input[type=checkbox]")], ok=cb.filter(x=>x.checked).length;
+  set("prep",`完成 ${ok} / ${cb.length} 項`); const st=$("#mest-出發前"); if(st) st.textContent=ok<cb.length?`還有 ${cb.length-ok} 項沒準備`:"都準備好了";
+  const dn=document.querySelectorAll("#vault .doc").length; set("vault",dn?`${dn} 張・用 PIN 加密`:"護照、卡片照片加密存在手機");
+  const pk=document.querySelectorAll("#packs small.ok").length; set("off",pk?`已下載 ${pk} 個城市`:"出發前在 Wi‑Fi 下載城市地圖");
+  set("pay","Apple Pay 為主，現金備 50–100 歐");
+  set("guide","10 頁 PDF，可以存到手機");
+  const ph=($("#ecPhone")||{}).value||""; set("ec",ph?`${ph.length>7?ph.slice(0,ph.length-6)+"•••"+ph.slice(-3):ph}・SOS 簡訊會傳給他`:"還沒設定，SOS 簡訊會傳給他");
+  set("lost","護照、信用卡、手機，照順序處理");
+  const nl=(($("#notes")||{}).value||"").split("\n").filter(x=>x.trim()).length; set("notes",nl?`記了 ${nl} 筆`:"記下每張卡的海外掛失電話");
+}
+function openMe(k){if(!secs[k])return;me.classList.add("detail");Object.values(secs).forEach(x=>x.classList.toggle("on",x===secs[k]));window.scrollTo(0,0);
+  const tt=document.getElementById("tbTitle"); if(tt) tt.textContent=TITLE[k]||"我的";}
+function closeMe(){me.classList.remove("detail");Object.values(secs).forEach(x=>x.classList.remove("on"));meSum();window.scrollTo(0,0);
+  const tt=document.getElementById("tbTitle"); if(tt) tt.textContent="我的";}
+window.openMe=openMe;
+me.addEventListener("click",e=>{const o=e.target.closest("[data-meopen]");if(o){openMe(o.dataset.meopen);return;}
+  if(e.target.closest("[data-meback]")) closeMe();});
+const _go=go; go=function(tab){_go.apply(this,arguments); if(tab==="me") closeMe(); if(tab==="explore") mapLayout();};
+$("#sosLost").addEventListener("click",()=>setTimeout(()=>openMe("lost"),0));
+meSum();
+
+/* ---- 地圖：全螢幕 ---- */
+const sheet=document.createElement("div"); sheet.className="msheet"; sheet.id="mapSheet";
+sheet.innerHTML=`<button type="button" class="msh-grip" id="mshGrip" aria-label="展開或收起清單"><i></i></button><div class="msh-body" id="mshBody"></div>`;
+$("#v-explore").appendChild(sheet);
+const body=$("#mshBody");
+["#filters","#pick","#list","#baseHint","#air"].forEach(q=>{const el=$(q);if(el)body.appendChild(el);});
+const fAll=document.querySelector('#filters [data-f="all"]'); if(fAll) fAll.textContent="附近全部";
+$("#cityPop").appendChild($("#cities"));
+const mh=$("#mhBody");
+function fillHelp(){
+  mh.innerHTML="";
+  const p1=document.createElement("p"); p1.textContent=$("#mapHint").textContent; mh.appendChild(p1);
+  const mn=$("#metro .hint"); if(mn){const p2=document.createElement("p");p2.textContent=mn.textContent;mh.appendChild(p2);}
+  const off=$("#metro a.btn"); if(off){const a=off.cloneNode(true);a.className="btn ghost";mh.appendChild(a);}
+  const tb=$("#mapTransit"); if(tb){tb.className="btn";tb.style.cssText="";mh.appendChild(tb);}
+}
+$("#mapHint").classList.add("sr");
+$("#zHelp").addEventListener("click",()=>{fillHelp();$("#mapHelp").classList.add("on");});
+$("#mhClose").addEventListener("click",()=>$("#mapHelp").classList.remove("on"));
+$("#mapHelp").addEventListener("click",e=>{if(e.target.id==="mapHelp")$("#mapHelp").classList.remove("on");
+  if(e.target.closest("#mapTransit"))$("#mapHelp").classList.remove("on");});
+const pop=$("#cityPop"), cbtn=$("#cityBtn");
+function popShow(v){pop.hidden=!v;cbtn.setAttribute("aria-expanded",v);}
+cbtn.addEventListener("click",()=>popShow(pop.hidden));
+pop.addEventListener("click",e=>{if(e.target.closest("button"))setTimeout(()=>popShow(false),0);});
+document.addEventListener("click",e=>{if(!pop.hidden&&!e.target.closest("#mapTop"))popShow(false);});
+function mapLayout(){$("#cityNm").textContent=city;setTimeout(()=>{try{if(typeof LM!=="undefined"&&LM)LM.invalidateSize();}catch(e){}},60);}
+const _re=renderExplore; renderExplore=function(){_re.apply(this,arguments);$("#cityNm").textContent=city;};
+// bottom sheet drag
+let y0=null, t0=0, base=0, moved=false;
+const grip=$("#mshGrip");
+function hgt(){return sheet.getBoundingClientRect().height;}
+function peek(){return parseFloat(getComputedStyle($("#v-explore")).getPropertyValue("--peek"))||236;}
+grip.addEventListener("pointerdown",e=>{y0=e.clientY;t0=Date.now();moved=false;base=sheet.classList.contains("open")?0:hgt()-peek();sheet.classList.add("drag");grip.setPointerCapture(e.pointerId);});
+grip.addEventListener("pointermove",e=>{if(y0==null)return;const dy=e.clientY-y0;if(Math.abs(dy)>4)moved=true;
+  const y=Math.min(hgt()-peek(),Math.max(0,base+dy));sheet.style.transform=`translateY(${y}px)`;});
+function end(e){if(y0==null)return;const dy=e.clientY-y0, v=dy/Math.max(1,Date.now()-t0);sheet.classList.remove("drag");sheet.style.transform="";
+  if(!moved) sheet.classList.toggle("open");
+  else{const y=base+dy; const open=v<-0.4?true:v>0.4?false:y<(hgt()-peek())/2; sheet.classList.toggle("open",open);}
+  y0=null;}
+grip.addEventListener("pointerup",end); grip.addEventListener("pointercancel",end);
+grip.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){}});
+grip.addEventListener("click",e=>{if(e.detail===0)sheet.classList.toggle("open");});
+// 點清單裡的地點 → 收起清單讓地圖露出
+body.addEventListener("click",e=>{if(e.target.closest("[data-i],[data-go],.item h3"))sheet.classList.remove("open");});
 })();
 </script>
 </body>
