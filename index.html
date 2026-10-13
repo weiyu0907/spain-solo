@@ -1226,6 +1226,11 @@ nav button[aria-selected="true"]::before{content:"";position:absolute;top:-1px;l
 @media (prefers-reduced-motion:reduce){.msheet{transition:none}}
 #mhBody p{font-size:14.5px;line-height:1.6;margin:0 0 10px}
 #mhBody .btn{display:flex;align-items:center;justify-content:center;min-height:46px;margin-top:8px;text-decoration:none;width:100%;box-sizing:border-box}
+
+/* ===== v3.3 備份與還原 ===== */
+.bkopt{display:flex;gap:10px;align-items:flex-start;margin-top:12px;font-size:14.5px;line-height:1.5}
+.bkopt input{width:22px;height:22px;flex:none;margin-top:1px;accent-color:var(--ink)}
+#bkLoadL{display:flex;align-items:center;justify-content:center}
 </style>
 </head>
 <body>
@@ -1480,6 +1485,18 @@ nav button[aria-selected="true"]::before{content:"";position:absolute;top:-1px;l
     <div class="panel">
       <label for="notes" class="hint" style="display:block;margin:0 0 6px">例如：○○銀行 Visa 海外掛失 +886-2-xxxx-xxxx。不加密，<b>不要寫卡號或密碼</b>。</label>
       <textarea id="notes" placeholder="銀行名稱、卡別、海外掛失電話"></textarea>
+    </div>
+
+    <h2>備份與還原</h2>
+    <div class="panel" id="bkPanel">
+      <p class="hint" style="margin:0">把行程、住宿、緊急聯絡人、記事和清單存成一個檔案。換手機、從 Safari 換到主畫面 App、或資料被清掉時，用它救回來。</p>
+      <label class="bkopt"><input type="checkbox" id="bkDocs" checked><span>包含證件照片（照片仍用你的 PIN 加密，還原後用同一組 PIN 解鎖）</span></label>
+      <div class="btnrow">
+        <button class="btn" id="bkSave" type="button">備份到手機</button>
+        <label class="btn ghost" id="bkLoadL" style="cursor:pointer">從檔案還原<input id="bkFile" type="file" accept=".json,application/json,text/plain" hidden></label>
+      </div>
+      <p class="hint" id="bkMsg" style="margin:10px 0 0"></p>
+      <p class="hint">建議出發前備份一次、旅途中每隔幾天再備份一次，存到「檔案」App 的 iCloud 雲碟，手機掉了也拿得回來。備份檔裡的記事和地址沒有加密，不要傳到公開的地方。</p>
     </div>
 
     <h2>證件備份（加密）</h2>
@@ -3138,7 +3155,7 @@ renderPhr();
 const me=$("#v-me"), secs={};
 (function wrap(){
   const kids=[...me.children]; let cur=null;
-  const KEY={"使用說明書":"guide","我的住宿":"stay","緊急聯絡人":"ec","付款怎麼準備":"pay","離線使用":"off","東西被偷了怎麼辦":"lost","出發前備份清單":"prep","掛失電話記事":"notes","證件備份（加密）":"vault"};
+  const KEY={"使用說明書":"guide","我的住宿":"stay","緊急聯絡人":"ec","付款怎麼準備":"pay","離線使用":"off","東西被偷了怎麼辦":"lost","出發前備份清單":"prep","掛失電話記事":"notes","證件備份（加密）":"vault","備份與還原":"backup"};
   kids.forEach(el=>{
     if(el.tagName==="H1") return;
     if(el.tagName==="H2"){const k=KEY[el.textContent.trim()]||("s"+Object.keys(secs).length);
@@ -3153,14 +3170,15 @@ const IC={
  prep:['#0072CE','<path d="M9 5h10M9 12h10M9 19h10M4 5l1 1 2-2M4 12l1 1 2-2M4 19l1 1 2-2"/>'],
  vault:['#111827','<rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/>'],
  off:['#5F6B7A','<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>'],
+ backup:['#0E7C86','<path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9a4 4 0 0 1 0 9"/><path d="M12 12v8M9 15l3-3 3 3"/>'],
  pay:['#C98A00','<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 15h3"/>'],
  guide:['#93328E','<path d="M6 3h9l3 3v15H6z"/><path d="M9 11h6M9 15h6"/>'],
  ec:['#D62828','<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>'],
  lost:['#D62828','<path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2M10 13l4 4M14 13l-4 4"/>'],
  notes:['#D62828','<path d="M5 4h14v16H5z"/><path d="M8 9h8M8 13h8M8 17h5"/>'],
 };
-const TITLE={stay:"我的住宿",prep:"出發前備份清單",vault:"證件備份",off:"離線地圖",pay:"付款怎麼準備",guide:"使用說明書",ec:"緊急聯絡人",lost:"東西被偷了怎麼辦",notes:"掛失電話記事"};
-const STA=[["出發前",["stay","prep","vault","off","pay"],""],["旅途中",["guide"],""],["出事時",["ec","lost","notes"],"emg"]];
+const TITLE={stay:"我的住宿",prep:"出發前備份清單",vault:"證件備份",off:"離線地圖",pay:"付款怎麼準備",guide:"使用說明書",ec:"緊急聯絡人",lost:"東西被偷了怎麼辦",notes:"掛失電話記事",backup:"備份與還原"};
+const STA=[["出發前",["stay","prep","vault","backup","off","pay"],""],["旅途中",["guide"],""],["出事時",["ec","lost","notes"],"emg"]];
 const line=document.createElement("div"); line.className="meline";
 line.innerHTML=STA.map(([nm,ks,cls])=>`<div class="mest ${cls}"><h2>${nm}</h2><small id="mest-${nm}"></small></div><div class="megrp ${cls}">`+
   ks.filter(k=>secs[k]).map(k=>`<button type="button" class="merow" data-meopen="${k}"><i class="qi" style="--qc:${IC[k][0]}" aria-hidden="true"><svg viewBox="0 0 24 24">${IC[k][1]}</svg></i><span class="tx"><b>${TITLE[k]}</b><span id="mes-${k}"></span></span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>`).join("")+`</div>`).join("");
@@ -3173,6 +3191,7 @@ function meSum(){
   const dn=document.querySelectorAll("#vault .doc").length; set("vault",dn?`${dn} 張・用 PIN 加密`:"護照、卡片照片加密存在手機");
   const pk=document.querySelectorAll("#packs small.ok").length; set("off",pk?`已下載 ${pk} 個城市`:"出發前在 Wi‑Fi 下載城市地圖");
   set("pay","Apple Pay 為主，現金備 50–100 歐");
+  const ba=ls.get("ss_backup_at",null); set("backup",ba?`上次備份：${shortDate(ba.slice(0,10))} ${ba.slice(11,16)}`:"還沒備份過，換手機或被清掉時能救回");
   set("guide","10 頁 PDF，可以存到手機");
   const ph=($("#ecPhone")||{}).value||""; set("ec",ph?`${ph.length>7?ph.slice(0,ph.length-6)+"•••"+ph.slice(-3):ph}・SOS 簡訊會傳給他`:"還沒設定，SOS 簡訊會傳給他");
   set("lost","護照、信用卡、手機，照順序處理");
@@ -3234,6 +3253,59 @@ grip.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){}});
 grip.addEventListener("click",e=>{if(e.detail===0)sheet.classList.toggle("open");});
 // 點清單裡的地點 → 收起清單讓地圖露出
 body.addEventListener("click",e=>{if(e.target.closest("[data-i],[data-go],.item h3"))sheet.classList.remove("open");});
+})();
+
+/* ===== v3.3 備份與還原 ===== */
+(function(){
+const b64=u=>{u=new Uint8Array(u);let s="";for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s);};
+const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const msg=t=>{$("#bkMsg").textContent=t;};
+const stamp=()=>{const d=new Date(),p=n=>String(n).padStart(2,"0");return `${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}`;};
+async function build(withDocs){
+  const out={app:"spain-solo",v:1,at:new Date().toISOString(),ls:{},vault:null};
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith("ss_"))out.ls[k]=localStorage.getItem(k);}
+  if(withDocs){try{const m=await tx("meta","readonly",s=>s.get("m"));
+    if(m){const docs=await tx("docs","readonly",s=>s.getAll())||[];
+      out.vault={meta:{salt:b64(m.salt),iv:b64(m.iv),chk:b64(m.chk)},docs:docs.map(d=>({id:d.id,name:d.name,iv:b64(d.iv),data:b64(d.data)}))};}}catch(e){}}
+  return out;
+}
+$("#bkSave").addEventListener("click",async()=>{
+  msg("準備中…");
+  const at=new Date(); const local=`${at.getFullYear()}-${String(at.getMonth()+1).padStart(2,"0")}-${String(at.getDate()).padStart(2,"0")}T${String(at.getHours()).padStart(2,"0")}:${String(at.getMinutes()).padStart(2,"0")}`;
+  ls.set("ss_backup_at",local);
+  const data=await build($("#bkDocs").checked);
+  const name=`西班牙獨旅-備份-${stamp()}.json`;
+  const file=new File([JSON.stringify(data)],name,{type:"application/json"});
+  const nd=data.vault?data.vault.docs.length:0, nk=Object.keys(data.ls).length;
+  const sum=`共 ${nk} 項設定${nd?`、${nd} 張證件`:""}`;
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+    try{await navigator.share({files:[file],title:"西班牙獨旅 備份"});msg(`已備份（${sum}）。在分享選單選「儲存到檔案」，存到 iCloud 雲碟最保險。`);}
+    catch(e){msg(e&&e.name==="AbortError"?"已取消。":"分享失敗，請再試一次。");}
+  }else{
+    const u=URL.createObjectURL(file),a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(u),30000);msg(`已下載備份檔（${sum}）。`);
+  }
+});
+$("#bkFile").addEventListener("change",async e=>{
+  const f=e.target.files[0]; e.target.value=""; if(!f) return;
+  let d; try{d=JSON.parse(await f.text());}catch(err){msg("這不是西班牙獨旅的備份檔（讀不出內容）。");return;}
+  if(!d||d.app!=="spain-solo"||!d.ls||typeof d.ls!=="object"){msg("這不是西班牙獨旅的備份檔。");return;}
+  const keys=Object.keys(d.ls).filter(k=>k.startsWith("ss_")&&typeof d.ls[k]==="string");
+  const nd=d.vault&&Array.isArray(d.vault.docs)?d.vault.docs.length:0;
+  const when=(d.at||"").slice(0,16).replace("T"," ");
+  if(!confirm(`要用 ${when} 的備份覆蓋這支手機上的資料嗎？\n\n會換掉：行程、住宿、緊急聯絡人、記事、清單${nd?`，以及證件照片（${nd} 張）`:""}。\n目前手機上的這些資料會被取代。`)) return;
+  for(const k of keys) localStorage.setItem(k,d.ls[k]);
+  if(d.vault&&d.vault.meta){
+    try{
+      const m=d.vault.meta;
+      await tx("docs","readwrite",s=>s.clear()); await tx("meta","readwrite",s=>s.clear());
+      await tx("meta","readwrite",s=>s.put({salt:unb64(m.salt),iv:unb64(m.iv),chk:unb64(m.chk).buffer},"m"));
+      for(const x of d.vault.docs) await tx("docs","readwrite",s=>s.put({id:x.id,name:x.name,iv:unb64(x.iv),data:unb64(x.data).buffer}));
+    }catch(err){alert("證件照片還原失敗，其他資料已還原。");}
+  }
+  alert("還原完成，App 會重新整理。"+(nd?"\n證件照片請用備份時的同一組 PIN 解鎖。":""));
+  location.reload();
+});
 })();
 </script>
 </body>
