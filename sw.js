@@ -2,10 +2,11 @@
    - App 本體：網路優先（有網路就拿新版），沒網路用快取
    - 地圖圖磚：只快取「看過的」圖磚（不預先大量下載，符合 OSM 使用規範），背景更新
    - 字型：快取後背景更新 */
-const SHELL_CACHE = "ss-shell-v8";
+const SHELL_CACHE = "ss-shell-v10";
 const TILE_CACHE = "ss-tiles";
 const FONT_CACHE = "ss-fonts";
-const MAP_CACHE = "ss-maps"; // 使用者手動下載的城市離線地圖，由頁面管理
+const MAP_CACHE = "ss-maps";
+const OCR_CACHE = "ss-ocr"; // 拍照辨識程式與西文字庫（約 10 MB），第一次用到才下載
 const TILE_LIMIT = 3000;
 const SHELL = ["./", "./index.html", "./manifest.webmanifest", "./apple-touch-icon.png", "./icon-192.png", "./icon-512.png", "./guide.pdf",
   "./transit/barcelona.json", "./transit/madrid.json", "./transit/sevilla.json", "./transit/granada.json", "./transit/valencia.json", "./data/zones.json"];
@@ -20,7 +21,7 @@ self.addEventListener("install", (e) => {
 
 self.addEventListener("activate", (e) => {
   e.waitUntil((async () => {
-    const keep = [SHELL_CACHE, TILE_CACHE, FONT_CACHE, MAP_CACHE];
+    const keep = [SHELL_CACHE, TILE_CACHE, FONT_CACHE, MAP_CACHE, OCR_CACHE];
     for (const k of await caches.keys()) if (!keep.includes(k)) await caches.delete(k);
     await self.clients.claim();
   })());
@@ -86,6 +87,16 @@ self.addEventListener("fetch", (e) => {
       const c = await caches.open(SHELL_CACHE);
       try { const res = await fetch(req, { cache: "no-cache" }); if (res.ok) c.put(req, res.clone()); return res; }
       catch (err) { return (await c.match(req)) || new Response("", { status: 504 }); }
+    })());
+    return;
+  }
+
+  // 拍照辨識檔：有存就用存的（檔案大、不常改）
+  if (url.origin === self.location.origin && url.pathname.includes("/ocr/")) {
+    e.respondWith((async () => {
+      const c = await caches.open(OCR_CACHE);
+      const hit = await c.match(req); if (hit) return hit;
+      const res = await fetch(req); if (res.ok) c.put(req, res.clone()); return res;
     })());
     return;
   }
