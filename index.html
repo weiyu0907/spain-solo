@@ -1789,6 +1789,7 @@ html[lang="en"] #signLa{display:none}
 </div>
 
 <div class="sheet" id="infoSheet" role="dialog" aria-modal="true" aria-label="旅行須知"><div class="box"><h2 id="infoH">旅行須知</h2><div id="infoBody"></div><button class="big close" data-x38>關閉</button></div></div>
+<div class="sheet" id="safeSheet" role="dialog" aria-modal="true" aria-label="報平安"><div class="box"><h2 id="safeHd">報平安</h2><textarea id="safeTx" rows="7" class="mdin" style="font-size:16px;line-height:1.5;resize:vertical"></textarea><p class="hint" id="safeNote"></p><div style="display:flex;gap:8px;margin-top:8px"><button type="button" class="btn" id="safeGo" style="flex:1">傳送</button><button type="button" class="btn ghost" id="safeX" data-x38 style="flex:1">取消</button></div></div></div>
 <div class="sheet" id="fxSheet" role="dialog" aria-modal="true" aria-label="匯率換算"><div class="box" id="fxBox"></div></div>
 <div class="sheet" id="medSheet" role="dialog" aria-modal="true" aria-label="西文醫療卡"><div class="box" id="medBox"></div></div>
 <div class="card-full medfull" id="medFull" role="dialog" aria-modal="true" aria-label="Información médica"><button class="x" id="medX">關閉</button><div id="medOut" data-noi18n></div></div>
@@ -3932,25 +3933,51 @@ function safeSub(){const at=ls.get("ss_safe_at",null),el=$("#qSafeSub");if(!el)r
   const m=Math.round((Date.now()-Date.parse(at))/60000);
   el.textContent=m<60?T(`上次 ${Math.max(1,m)} 分鐘前`,`Last: ${Math.max(1,m)} min ago`):m<1440?T(`上次 ${Math.round(m/60)} 小時前`,`Last: ${Math.round(m/60)} h ago`):T(`上次 ${Math.round(m/1440)} 天前`,`Last: ${Math.round(m/1440)} d ago`);}
 safeSub(); setInterval(safeSub,60000);
+/* 反查地區名稱：OpenStreetMap Nominatim（有網路才用；一次點擊只查一次，同一地點有快取）*/
+const inTW=p=>p&&p[0]>21.8&&p[0]<25.4&&p[1]>119.9&&p[1]<122.1;
+async function rgeo(p){
+  const key=p[0].toFixed(3)+","+p[1].toFixed(3), c0=ls.get("ss_rgeo",{});
+  if(c0.k===key&&c0.lang===(EN?"en":"zh")) return c0.v;
+  if(!navigator.onLine) return null;
+  try{const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),4000);
+    const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=16&addressdetails=1&lat=${p[0]}&lon=${p[1]}&accept-language=${EN?"en":"zh-TW,zh,es"}`,{signal:ctl.signal});
+    clearTimeout(tm); if(!r.ok) return null; const j=await r.json(), a=j&&j.address; if(!a) return null;
+    const ZH={"Barcelona":"巴塞隆納","Madrid":"馬德里","Sevilla":"塞維亞","Seville":"塞維亞","Granada":"格拉納達","Valencia":"瓦倫西亞","València":"瓦倫西亞"};
+    const hasCity=["county","city","town","village","municipality"].some(k=>a[k]);
+    const pick=[]; for(const k of ["state","county","city","town","village","municipality","city_district","district","suburb","quarter","neighbourhood"]){if(k==="state"&&hasCity)continue;let v=a[k];if(v&&!EN&&ZH[v])v=ZH[v];if(v&&!pick.some(x=>x===v||x.includes(v)||v.includes(x)))pick.push(v);}
+    const area=pick.slice(-3).join(" "), v={area,country:a.country||"",cc:(a.country_code||"").toLowerCase()};
+    ls.set("ss_rgeo",{k:key,lang:EN?"en":"zh",v}); return v;
+  }catch(e){return null;}
+}
 async function safeText(){
   const t=times();
-  // 先拿 GPS；城市只用「實際位置」判斷（30 公里內才算在那個城市），不用站牌／地圖正在看的城市
   let p=null; try{p=await Promise.race([getOnce(),new Promise(r=>setTimeout(()=>r(null),9000))]);}catch(e){}
-  let c=""; try{if(p){const [nc,nd]=nearestCity(p); if(nd<30000) c=nc;}}catch(e){}
-  // 住宿只在「今天在入住期間」才寫今晚住
+  // 地區：先用網路反查（例：新竹縣 竹北市 東平里／Barcelona Ciutat Vella el Barri Gòtic）；沒網路時退回「30 公里內的收錄城市」
+  let g=p?await rgeo(p):null, area="";
+  if(g&&g.area) area=g.area+(g.country&&g.cc!=="es"&&g.cc!=="tw"?`（${g.country}）`:"");
+  else{try{if(p){const [nc,nd]=nearestCity(p); if(nd<30000) area=EN?(CITY_EN[nc]||nc):nc; else if(inTW(p)) area=T("台灣","Taiwan");}}catch(e){}}
   let stay=""; try{const d=todayStr(); const st=(ls.get("ss_stays",[])||[]).find(x=>x.ci&&x.co&&x.ci<=d&&d<x.co); if(st&&st.name) stay=st.name;}catch(e){}
-  const L=[T("我平安 👍","I'm safe 👍"),T(`西班牙 ${t.es}（台灣 ${t.tw}）`,`Spain ${t.es} (Taiwan ${t.tw})`)];
-  if(c) L.push(T(`現在在：${c}`,`Now in: ${EN?(CITY_EN[c]||c):c}`));
+  const L=[T("我平安 👍","I'm safe 👍"), T(`西班牙 ${t.es}（台灣 ${t.tw}）`,`Spain ${t.es} (Taiwan ${t.tw})`)];
+  if(area) L.push(T(`現在在：${area}`,`Now in: ${area}`));
   if(stay) L.push(T(`今晚住：${stay}`,`Staying at: ${stay}`));
   L.push(p?T(`位置：${mapsLink(p)}`,`Location: ${mapsLink(p)}`):T("（暫時抓不到定位）","(location unavailable)"));
   return L.join("\n");
 }
+/* 先顯示預覽（可以改字），按「傳送」才叫分享選單：等定位和查地名不會讓 iPhone 擋掉分享 */
 $("#qSafe").addEventListener("click",async()=>{
-  const text=await safeText(); window.__safeLast=text;
-  const done=()=>{ls.set("ss_safe_at",new Date().toISOString());safeSub();};
+  document.querySelectorAll(".sheet.on").forEach(x=>x.classList.remove("on"));
+  const tx=$("#safeTx"), go=$("#safeGo"); tx.value=T("取得位置和地區中…","Getting location…"); go.disabled=true; $("#safeSheet").classList.add("on");
+  const text=await safeText(); window.__safeLast=text; tx.value=text; go.disabled=false;
+});
+$("#safeGo").addEventListener("click",async()=>{
+  const text=$("#safeTx").value.trim(); if(!text) return;
+  const done=()=>{ls.set("ss_safe_at",new Date().toISOString());safeSub();$("#safeSheet").classList.remove("on");};
   if(navigator.share){try{await navigator.share({text});done();return;}catch(err){if(err.name==="AbortError")return;}}
   try{await navigator.clipboard.writeText(text);done();toast(T("已複製，貼到 LINE 傳給家人","Copied — paste it into your chat app"));}catch(err){toast(text);}
 });
+$("#safeSheet").addEventListener("click",e=>{if(e.target.id==="safeSheet"||e.target.closest("[data-x38]"))$("#safeSheet").classList.remove("on");});
+$("#safeHd").textContent=T("報平安","I'm safe");$("#safeGo").textContent=T("傳送","Send");$("#safeX").textContent=T("取消","Cancel");
+$("#safeNote").textContent=T("地區名稱由 OpenStreetMap 反查（需要網路）；可以先改字再傳。","Area name from OpenStreetMap (needs internet). You can edit before sending.");
 
 /* ---------- 旅行須知 ---------- */
 const NEW=`<span class="new">${T("新制","NEW")}</span>`;
