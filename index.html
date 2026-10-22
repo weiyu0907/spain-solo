@@ -2619,11 +2619,14 @@ const todayStr=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.get
 function pickStay(){
   if(!stays.length) return [null,""];
   const t=todayStr();
-  const now=stays.find(x=>x.ci&&x.co&&x.ci<=t&&t<x.co);
+  /* v4.1 stay：沒填退房日的住宿，視為住到「下一間入住日」為止（最後一間就當住一晚）；重疊時取比較晚入住的那間 */
+  const byCi=stays.filter(x=>x.ci).slice().sort((a,b)=>a.ci.localeCompare(b.ci));
+  const coOf=(x,i)=>x.co||(byCi[i+1]?byCi[i+1].ci:addDays(x.ci,1));
+  const now=byCi.map((x,i)=>[x,coOf(x,i)]).filter(([x,co])=>x.ci<=t&&t<co).map(([x])=>x).pop();
   if(now) return [now,"我的住宿・今晚"];
-  const up=stays.filter(x=>x.ci&&x.ci>t).sort((a,b)=>a.ci.localeCompare(b.ci))[0];
+  const up=byCi.find(x=>x.ci>t);
   if(up) return [up,`下一站・${up.ci.slice(5).replace("-","/")} 入住`];
-  return [stays[stays.length-1],"我的住宿"];
+  return [byCi[byCi.length-1]||stays[stays.length-1],"我的住宿"];
 }
 function stayDest(x){return (x.lat!=null)?`${x.lat},${x.lng}`:encodeURIComponent(x.addr||x.name);}
 function renderStay(){
@@ -4467,6 +4470,12 @@ window.openAtm=openAtm; window.__atmClassify=t=>classify(t)[0];
 $("#qAtm").addEventListener("click",openAtm);
 $("#atmSheet").addEventListener("click",e=>{if(e.target.id==="atmSheet"||e.target.closest("#atmClose"))$("#atmSheet").classList.remove("on");else if(e.target.closest("#atmRe"))search(true);});
 })();
+
+/* ===== v4.1 stay：日期變了（過午夜、從背景回來）就重畫住宿卡和今日行程 ===== */
+(function(){let last=todayStr();
+const chk=()=>{const t=todayStr();if(t!==last){last=t;try{renderStay();}catch(e){}try{if(typeof renderToday==="function")renderToday();}catch(e){}}};
+setInterval(chk,60000);document.addEventListener("visibilitychange",()=>{if(!document.hidden){last="";chk();}});
+window.__pickStay=()=>{const [x,l]=pickStay();return x?[x.name,l]:[null,l];};})();
 
 /* ===== v3.6 i18n 英文介面 ===== */
 (function(){
