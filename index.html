@@ -1444,6 +1444,19 @@ table.kv td:first-child{font-weight:900;padding-right:10px;width:30%}
 .stay-pop a{display:inline-block;margin-top:6px;margin-right:8px;font-weight:700}
 #v-explore #metro .chips button.stc[aria-pressed="true"]{background:#F5C243;color:#111827}
 
+/* ===== v4.3 search 搜尋＋捲動順暢 ===== */
+.topbar.solid{-webkit-backdrop-filter:none!important;backdrop-filter:none!important;background:var(--bg)!important}
+.sheet{overscroll-behavior:contain;touch-action:none}
+.sheet .box{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+.sheet .box *{touch-action:manipulation}
+.msheet{transition:transform .28s cubic-bezier(.2,.8,.2,1)!important;will-change:transform}
+.msheet.drag{transition:none!important}
+.msh-body{touch-action:pan-y;overscroll-behavior:contain}
+.srch-src{font-size:12px;color:var(--muted);margin:10px 2px 4px;font-weight:700}
+.srch-g{display:flex;flex-direction:column;gap:6px;margin-top:10px;padding:12px;border-radius:14px;background:var(--soft)}
+.srch-g p{margin:0;font-size:13.5px;line-height:1.55}
+.srch-g a{align-self:flex-start;text-decoration:none;display:inline-flex;align-items:center;min-height:44px}
+
 /* ===== v3.6 i18n 語言切換 ===== */
 #v-me.detail .langrow{display:none}
 .langrow{display:flex;align-items:center;gap:10px;margin:0 0 6px;padding:10px 14px;border-radius:16px;background:var(--soft)}
@@ -4511,6 +4524,9 @@ async function nomi(q){
   try{const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=es&accept-language=es&q=${encodeURIComponent(q)}`,{signal:ctl.signal});
     clearTimeout(tm); if(!r.ok) return null; const j=await r.json(); return j&&j[0]?[+j[0].lat,+j[0].lon]:[];}catch(e){return null;}
 }
+async function photonQ(q){const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),7000);
+  try{const r=await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=3&lat=40.4&lon=-3.7`,{signal:ctl.signal});clearTimeout(tm);if(!r.ok)return null;const j=await r.json();
+    const f=(j.features||[]).find(f=>(f.properties||{}).countrycode==="ES");return f?[f.geometry.coordinates[1],f.geometry.coordinates[0]]:[];}catch(e){return null;}}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 let busy=false;
 const manual=x=>{if(x.geo==="osm"&&x.gl&&x.lat!=null&&(Math.abs(x.lat-x.gl[0])>1e-7||Math.abs(x.lng-x.gl[1])>1e-7)){delete x.geo;delete x.gl;delete x.ga;}}; // 使用者改用 GPS 標記 → 以 GPS 為準
@@ -4520,7 +4536,8 @@ async function geocodeAll(){
   if(busy||!navigator.onLine) return; busy=true; let changed=false;
   try{for(const x of stays.filter(need)){
     let hit=null, failNet=false;
-    for(const q of queries(x)){const r=await nomi(q); await sleep(1100); if(r===null){failNet=true;break;} if(r.length){hit=r;break;}}
+    const xy=window.__coordsIn&&window.__coordsIn((x.addr||"")+" "+(x.name||"")); if(xy) hit=xy;
+    if(!hit) for(const q of queries(x)){let r=await nomi(q); await sleep(1100); if(r===null){failNet=true;break;} if(!r.length){const ph=await photonQ(q); if(ph&&ph.length) r=ph;} if(r.length){hit=r;break;}}
     const cur=stays.find(s=>s.id===x.id); if(!cur) continue;
     if(hit){cur.lat=hit[0];cur.lng=hit[1];cur.geo="osm";cur.ga=cur.addr||"";cur.gl=[hit[0],hit[1]];delete cur.gfail;changed=true;}
     else if(!failNet){cur.gfail=(cur.addr||"")+"|"+(cur.name||"");if(cur.geo==="osm"){cur.lat=null;cur.lng=null;delete cur.geo;}changed=true;}
@@ -4567,6 +4584,90 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-mstay]");i
 const sv=$("#stSave"); if(sv) sv.addEventListener("click",()=>setTimeout(()=>{if(stays.some(need))geocodeAll();},50));
 window.addEventListener("online",()=>{if(stays.some(need))geocodeAll();});
 if(stays.some(need)) setTimeout(geocodeAll,2500);
+})();
+
+/* ===== v4.3 search 地點搜尋加強 ===== */
+(function(){
+const EN=ls.get("ss_lang","zh")==="en";
+const T=(zh,en)=>EN?en:zh;
+const ALIAS={"聖家堂": "Sagrada Família", "聖家族大教堂": "Sagrada Família", "奎爾公園": "Park Güell", "桂爾公園": "Park Güell", "巴特略之家": "Casa Batlló", "巴特婁之家": "Casa Batlló", "米拉之家": "Casa Milà", "米拉公寓": "Casa Milà", "蘭布拉大道": "La Rambla", "蘭布拉": "La Rambla", "波格利亞市場": "Mercat de la Boqueria", "聖若瑟市場": "Mercat de la Boqueria", "波格利亞": "Mercat de la Boqueria", "哥德區": "Barri Gòtic", "加泰隆尼亞廣場": "Plaça de Catalunya", "加泰隆尼亞音樂廳": "Palau de la Música Catalana", "畢卡索美術館": "Museu Picasso", "畢卡索博物館": "Museu Picasso", "諾坎普": "Spotify Camp Nou", "諾坎普球場": "Spotify Camp Nou", "蒙特惠克": "Montjuïc", "蒙特惠克城堡": "Castell de Montjuïc", "魔幻噴泉": "Font Màgica de Montjuïc", "巴塞隆納海灘": "Platja de la Barceloneta", "凱旋門": "Arc de Triomf", "城堡公園": "Parc de la Ciutadella", "海上聖母教堂": "Santa Maria del Mar", "提比達波": "Tibidabo", "文生之家": "Casa Vicens", "奎爾宮": "Palau Güell", "西班牙村": "Poble Espanyol", "聖保羅醫院": "Recinte Modernista de Sant Pau", "格拉西亞大道": "Passeig de Gràcia", "恩寵大道": "Passeig de Gràcia", "巴塞隆納大教堂": "Catedral de Barcelona", "桑茲車站": "Barcelona Sants", "巴塞隆納機場": "Aeroport de Barcelona-El Prat", "太陽門": "Puerta del Sol", "太陽門廣場": "Puerta del Sol", "主廣場": "Plaza Mayor", "馬約爾廣場": "Plaza Mayor", "馬德里王宮": "Palacio Real de Madrid", "王宮": "Palacio Real", "普拉多美術館": "Museo del Prado", "普拉多博物館": "Museo del Prado", "蘇菲亞王后藝術中心": "Museo Reina Sofía", "索菲亞王后藝術中心": "Museo Reina Sofía", "提森博物館": "Museo Thyssen-Bornemisza", "雷蒂羅公園": "Parque del Retiro", "麗池公園": "Parque del Retiro", "水晶宮": "Palacio de Cristal", "格蘭大道": "Gran Vía", "聖米格爾市場": "Mercado de San Miguel", "德波神廟": "Templo de Debod", "伯納烏球場": "Estadio Santiago Bernabéu", "伯納烏": "Estadio Santiago Bernabéu", "阿穆德納大教堂": "Catedral de la Almudena", "阿托查車站": "Estación de Madrid Atocha", "阿托查": "Atocha", "跳蚤市場": "El Rastro", "西貝萊斯廣場": "Plaza de Cibeles", "阿爾卡拉門": "Puerta de Alcalá", "馬德里機場": "Aeropuerto Adolfo Suárez Madrid-Barajas", "塞維亞大教堂": "Catedral de Sevilla", "希拉達塔": "La Giralda", "塞維亞王宮": "Real Alcázar de Sevilla", "阿卡薩城堡": "Real Alcázar de Sevilla", "塞維亞皇宮": "Real Alcázar de Sevilla", "都市陽傘": "Setas de Sevilla", "大蘑菇": "Setas de Sevilla", "黃金塔": "Torre del Oro", "聖十字區": "Barrio de Santa Cruz", "鬥牛場": "Plaza de toros", "瑪麗亞路易莎公園": "Parque de María Luisa", "特里亞納": "Triana", "佛朗明哥博物館": "Museo del Baile Flamenco", "阿爾罕布拉宮": "Alhambra", "阿蘭布拉宮": "Alhambra", "赫內拉利費宮": "Generalife", "阿爾拜辛": "Albaicín", "阿爾拜辛區": "Albaicín", "聖尼古拉斯觀景台": "Mirador de San Nicolás", "格拉納達大教堂": "Catedral de Granada", "皇家禮拜堂": "Capilla Real", "薩克羅蒙特": "Sacromonte", "藝術科學城": "Ciudad de las Artes y las Ciencias", "海洋館": "Oceanogràfic", "中央市場": "Mercado Central", "絲綢交易所": "La Lonja de la Seda", "瓦倫西亞大教堂": "Catedral de Valencia", "圖里亞公園": "Jardín del Turia", "阿爾布費拉": "Albufera", "馬爾瓦羅薩海灘": "Playa de la Malvarrosa", "西班牙廣場": "Plaza de España", "大教堂": "Catedral", "機場": "Aeropuerto", "火車站": "Estación", "超市": "Supermercado", "藥局": "Farmacia", "市場": "Mercado", "海灘": "Playa", "博物館": "Museo", "公園": "Parque", "教堂": "Iglesia"};
+const HAN=/[㐀-鿿]/;
+const norm=t=>(t||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9㐀-鿿]+/g," ").trim();
+/* 從文字或地圖連結抓座標：41.4036, 2.1744｜@41.40,2.17｜ll=｜q=｜query=｜!3d41.40!4d2.17 */
+function coordsIn(t){
+  const pats=[/!3d(-?\d{1,2}\.\d+)!4d(-?\d{1,3}\.\d+)/,/[@=](-?\d{1,2}\.\d{3,}),\s*(-?\d{1,3}\.\d{3,})/,/(?:^|[^\d.])(-?\d{1,2}\.\d{3,})\s*[,，]\s*(-?\d{1,3}\.\d{3,})/];
+  for(const r of pats){const m=t.match(r);if(m){const a=+m[1],b=+m[2];if(Math.abs(a)<=90&&Math.abs(b)<=180)return [a,b];}}
+  return null;
+}
+window.__coordsIn=coordsIn;
+function aliasOf(q){if(!HAN.test(q))return null;if(ALIAS[q])return ALIAS[q];
+  const ks=Object.keys(ALIAS).filter(k=>q.includes(k)).sort((a,b)=>b.length-a.length);
+  if(!ks.length)return null; let out=q; for(const k of ks) out=out.split(k).join(" "+ALIAS[k]+" "); out=out.replace(/[㐀-鿿]+/g," ").replace(/\s+/g," ").trim(); return out||null;}
+window.__aliasOf=aliasOf;
+async function getJ(u,ms){const c=new AbortController(),t=setTimeout(()=>c.abort(),ms||8000);try{const r=await fetch(u,{signal:c.signal,headers:{"Accept":"application/json"}});clearTimeout(t);return r.ok?await r.json():null;}catch(e){return null;}}
+async function photon(q,c){const j=await getJ(`https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&lat=${c[0]}&lon=${c[1]}&limit=10`);
+  if(!j||!j.features) return null;
+  return j.features.map(f=>{const pr=f.properties||{},g=f.geometry&&f.geometry.coordinates;if(!g)return null;
+    const d=[pr.street?(pr.street+(pr.housenumber?" "+pr.housenumber:"")):"",pr.district||pr.locality||"",pr.city||pr.county||"",pr.country||""].filter(Boolean).join(", ");
+    return {n:pr.name||pr.street||q,p:[g[1],g[0]],k:"custom",d,src:"P",cc:(pr.countrycode||"").toLowerCase()};}).filter(Boolean);}
+async function nomi(q,c){const vb=[c[1]-0.3,c[0]+0.25,c[1]+0.3,c[0]-0.25].join(",");
+  const j=await getJ(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=8&countrycodes=es&accept-language=${EN?"en":"zh-TW"},es&viewbox=${vb}&q=${encodeURIComponent(q)}`);
+  if(!Array.isArray(j)) return null;
+  return j.map(x=>({n:x.name||x.display_name.split(",")[0],p:[+x.lat,+x.lon],k:"custom",d:x.display_name,src:"N",cc:"es"}));}
+function local(q){const nq=norm(q), al=aliasOf(q), na=al?norm(al):"";const out=[];
+  for(const cn in CITIES){(CITIES[cn].places||[]).forEach(pl=>{const n=norm(pl.n);if((nq&&n.includes(nq))||(nq&&nq.includes(n)&&n.length>=2)||(na&&ALIAS[pl.n]&&norm(ALIAS[pl.n]).includes(na)))out.push({n:pl.n,p:pl.p,k:pl.t,d:(pl.d||"")+"・"+cn,src:"L"});});}
+  (typeof stays!=="undefined"?stays:[]).forEach(x=>{if(x.lat!=null&&nq&&norm(x.name||"").includes(nq))out.push({n:x.name,p:[x.lat,x.lng],k:"stay",d:T("我的住宿","My stay"),src:"L"});});
+  return out;}
+function gLink(q,c){return `https://www.google.com/maps/search/${encodeURIComponent(q)}/@${c[0]},${c[1]},13z`;}
+const gBox=(q,c)=>`<div class="srch-g"><p>${T("Google 地圖找得到、這裡找不到？在 Google 地圖<b>長按</b>那個地點，上方會出現座標（例如 41.4036, 2.1744），點一下複製，回來貼到搜尋欄按搜尋就能加入。","Found it on Google Maps? <b>Long-press</b> the spot there, tap the coordinates (e.g. 41.4036, 2.1744) to copy, then paste them here and search.")}</p><a class="btn ghost" href="${gLink(q,c)}" target="_blank" rel="noopener">${T("在 Google 地圖搜尋「","Search Google Maps for “")}${esc(q)}${T("」","”")}</a></div>`;
+searchPlaces=async function(q){
+  const day=curDay(), C=CITIES[day.city], c=C?C.c:[40.4168,-3.7038], out=$("#addRes");
+  const show=(rows,extra)=>{out._rows=rows;
+    let h="",last="";
+    rows.forEach((r,i)=>{const lab=r.src==="L"?T("App 內建","Built-in"):r.src==="X"?T("座標","Coordinates"):T("OpenStreetMap","OpenStreetMap");
+      if(lab!==last){h+=`<div class="srch-src">${lab}</div>`;last=lab;}
+      h+=`<button data-res="${i}"><span><b>${esc(r.n)}</b><small>${esc(r.d||"")}${C&&r.p?T(`・距${day.city}市中心 ${fmt(dist(c,r.p))}`,` · ${fmt(dist(c,r.p))} from centre`):""}</small></span><i>+</i></button>`;});
+    out.innerHTML=h+(extra||"");};
+  // 1) 座標／地圖連結
+  const xy=coordsIn(q);
+  if(xy){const pm=q.match(/\/place\/([^\/@?]+)/);let nm0="";try{if(pm)nm0=decodeURIComponent(pm[1].replace(/\+/g," "));}catch(e){}
+    const nm=nm0||q.replace(/https?:\/\/\S+/g,"").replace(/(-?\d{1,3}\.\d+)\s*[,，]?\s*/g,"").trim();
+    show([{n:nm||T("自訂位置","Custom location"),p:xy,k:"custom",d:`${xy[0].toFixed(5)}, ${xy[1].toFixed(5)}`,src:"X"}],`<p class="hint">${T("要改名稱：先加入，再到行程點這個景點編輯。","Rename it later by editing the stop in Trip.")}</p>`);return;}
+  if(/maps\.app\.goo\.gl|goo\.gl\/maps/.test(q)){out._rows=[];out.innerHTML=gBox(q.replace(/https?:\/\/\S+/g,"").trim()||"",c).replace(/<a [^>]*>[^<]*<\/a>/,"")+`<p class="hint">${T("Google 地圖的分享短網址讀不到座標（要經過 Google 伺服器），請改用上面長按複製座標的方法。","Google’s short share links can’t be read here — copy the coordinates instead.")}</p>`;return;}
+  // 2) App 內建
+  const loc=local(q);
+  if(!navigator.onLine){show(loc,`<p class="hint">${T("沒有網路，只能搜 App 內建的地點。","Offline — only built-in places are searched.")}</p>`+gBox(q,c));return;}
+  show(loc,`<p class="hint">${T("搜尋中…","Searching…")}</p>`);
+  // 3) 線上：原字＋中文別名，Photon 和 Nominatim 一起查
+  const qs=[q]; const al=aliasOf(q); if(al&&al!==q) qs.push(al);
+  const res=await Promise.all(qs.flatMap(x=>[photon(x,c),nomi(x,c)]));
+  const failed=res.every(r=>r===null);
+  const all=[]; res.forEach(r=>(r||[]).forEach(x=>{if(x.cc&&x.cc!=="es")return;
+    if(all.some(y=>dist(y.p,x.p)<80&&(norm(y.n)===norm(x.n)||dist(y.p,x.p)<15)))return; all.push(x);}));
+  all.sort((a,b)=>dist(c,a.p)-dist(c,b.p));
+  const near=all.filter(x=>dist(c,x.p)<60000), far=all.filter(x=>dist(c,x.p)>=60000);
+  const rows=[...loc,...near,...far].slice(0,14);
+  show(rows,(failed?`<p class="hint">${T("線上搜尋暫時連不上。","Online search unavailable right now.")}</p>`:rows.length?"":`<p class="hint">${T(`找不到「${esc(q)}」。試試西文或英文名稱。`,`Nothing found for “${esc(q)}”. Try the Spanish or English name.`)}</p>`)+gBox(q,c));
+  window.__lastSearch={q,qs,rows:rows.map(r=>[r.src,r.n])};
+};
+const addQ=$("#addQ"); if(addQ) addQ.placeholder=T("地點名稱、地址，或貼上座標","Place, address, or paste coordinates");
+})();
+
+/* ===== v4.3 地圖清單拖曳：量一次高度、用 rAF 更新、清單捲到頂時往下拉也能收起 ===== */
+(function(){
+const sh=document.getElementById("mapSheet"), body=document.getElementById("mshBody"); if(!sh||!body) return;
+const peek=()=>parseFloat(getComputedStyle(document.getElementById("v-explore")).getPropertyValue("--peek"))||236;
+let y0=null,base=0,H=0,t0=0,last=0,raf=0,dy=0,lock=false;
+body.addEventListener("touchstart",e=>{if(e.touches.length!==1)return;y0=e.touches[0].clientY;t0=Date.now();H=sh.getBoundingClientRect().height;base=sh.classList.contains("open")?0:H-peek();dy=0;lock=false;},{passive:true});
+body.addEventListener("touchmove",e=>{if(y0==null)return;dy=e.touches[0].clientY-y0;
+  const open=sh.classList.contains("open");
+  // 清單在最上面且往下拉（收起），或清單還沒展開且往上推（展開）→ 由我們拖整個面板
+  if(!lock){if(Math.abs(dy)<6)return; lock=(open&&body.scrollTop<=0&&dy>0)||(!open&&dy<0)?"sheet":"list";if(lock==="sheet")sh.classList.add("drag");}
+  if(lock!=="sheet")return; e.preventDefault();
+  const y=Math.min(H-peek(),Math.max(0,base+dy));
+  if(!raf)raf=requestAnimationFrame(()=>{raf=0;sh.style.transform=`translateY(${y}px)`;});},{passive:false});
+body.addEventListener("touchend",()=>{if(y0==null)return;if(lock==="sheet"){cancelAnimationFrame(raf);raf=0;sh.classList.remove("drag");sh.style.transform="";
+  const v=dy/Math.max(1,Date.now()-t0),y=base+dy;sh.classList.toggle("open",v<-0.35?true:v>0.35?false:y<(H-peek())/2);}y0=null;lock=false;},{passive:true});
 })();
 
 /* ===== v3.6 i18n 英文介面 ===== */
