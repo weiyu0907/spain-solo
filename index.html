@@ -1434,6 +1434,16 @@ table.kv td:first-child{font-weight:900;padding-right:10px;width:30%}
 #atmBox ol,#atmBox ul{margin:0;padding-left:22px}
 #atmBox li{font-size:14.5px;line-height:1.6;margin:0 0 7px}
 
+/* ===== v4.2 staymap 地圖上的住宿 ===== */
+.stay-pin{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;background:#111827;color:#fff;border:2px solid #fff;border-radius:12px;padding:3px 8px 3px 5px;font-weight:900;font-size:12px;line-height:1.2;box-shadow:0 2px 6px rgba(0,0,0,.35);transform:translate(-50%,-100%);position:absolute;left:0;top:0}
+.stay-pin svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linejoin:round;flex:none}
+.stay-pin.now{background:#F5C243;color:#111827;font-size:13px;padding:4px 10px 4px 6px}
+.stay-pin.now svg{width:17px;height:17px}
+.stay-pin::after{content:"";position:absolute;left:50%;bottom:-7px;margin-left:-6px;border:6px solid transparent;border-top-color:#fff;border-bottom:0}
+.stay-pop b{font-size:14.5px}.stay-pop small{display:block;color:#5B6478;margin:2px 0 6px}
+.stay-pop a{display:inline-block;margin-top:6px;margin-right:8px;font-weight:700}
+#v-explore #metro .chips button.stc[aria-pressed="true"]{background:#F5C243;color:#111827}
+
 /* ===== v3.6 i18n 語言切換 ===== */
 #v-me.detail .langrow{display:none}
 .langrow{display:flex;align-items:center;gap:10px;margin:0 0 6px;padding:10px 14px;border-radius:16px;background:var(--soft)}
@@ -4476,6 +4486,88 @@ $("#atmSheet").addEventListener("click",e=>{if(e.target.id==="atmSheet"||e.targe
 const chk=()=>{const t=todayStr();if(t!==last){last=t;try{renderStay();}catch(e){}try{if(typeof renderToday==="function")renderToday();}catch(e){}}};
 setInterval(chk,60000);document.addEventListener("visibilitychange",()=>{if(!document.hidden){last="";chk();}});
 window.__pickStay=()=>{const [x,l]=pickStay();return x?[x.name,l]:[null,l];};})();
+
+/* ===== v4.2 staymap 地圖上的住宿 ===== */
+(function(){
+const EN=ls.get("ss_lang","zh")==="en";
+const T=(zh,en)=>EN?en:zh;
+const HOUSE='<svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10M10 20v-6h4v6"/></svg>';
+let stayOn=ls.get("ss_stay_on",true), LMstay=null;
+const save=()=>ls.set("ss_stays",stays);
+/* ---- 地址轉座標（OpenStreetMap Nominatim）：沒有座標、或地址改過的才查；一次一筆、間隔 1.1 秒 ---- */
+const ZH={"巴塞隆納":"Barcelona","巴塞隆拿":"Barcelona","馬德里":"Madrid","塞維亞":"Sevilla","塞維利亞":"Sevilla","格拉納達":"Granada","瓦倫西亞":"Valencia","瓦倫西亚":"Valencia","西班牙":"Spain"};
+function queries(x){
+  const a=(x.addr||"").trim(), out=[];
+  let lat=a; for(const k in ZH) lat=lat.split(k).join(" "+ZH[k]+" ");
+  lat=lat.replace(/[　-鿿＀-￯]+/g," ").replace(/\b(\d{4})$/,"0$1").replace(/\s+/g," ").trim(); // 西班牙郵遞區號 5 碼，08005 常被寫成 8005
+  if(a) out.push(a);
+  if(lat&&lat!==a&&/[A-Za-z]{3}/.test(lat)) out.push(lat);
+  if(lat&&/[A-Za-z]{3}/.test(lat)) out.push(lat.replace(/\b\d{5}\b/g,"").trim());
+  if(x.name){let c="";try{if(x.ci){const d=trip.days.find(d=>d.date===x.ci);if(d)c=ZH[d.city]||"";}}catch(e){} out.push(`${x.name} ${c}`.trim());}
+  return [...new Set(out.filter(Boolean))];
+}
+async function nomi(q){
+  const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),7000);
+  try{const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=es&accept-language=es&q=${encodeURIComponent(q)}`,{signal:ctl.signal});
+    clearTimeout(tm); if(!r.ok) return null; const j=await r.json(); return j&&j[0]?[+j[0].lat,+j[0].lon]:[];}catch(e){return null;}
+}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let busy=false;
+const manual=x=>{if(x.geo==="osm"&&x.gl&&x.lat!=null&&(Math.abs(x.lat-x.gl[0])>1e-7||Math.abs(x.lng-x.gl[1])>1e-7)){delete x.geo;delete x.gl;delete x.ga;}}; // 使用者改用 GPS 標記 → 以 GPS 為準
+const need=x=>{manual(x);return needQ(x);};
+const needQ=x=>(x.addr||x.name)&&((x.lat==null)||(x.geo==="osm"&&x.ga!==(x.addr||"")))&&!(x.gfail===(x.addr||"")+"|"+(x.name||""));
+async function geocodeAll(){
+  if(busy||!navigator.onLine) return; busy=true; let changed=false;
+  try{for(const x of stays.filter(need)){
+    let hit=null, failNet=false;
+    for(const q of queries(x)){const r=await nomi(q); await sleep(1100); if(r===null){failNet=true;break;} if(r.length){hit=r;break;}}
+    const cur=stays.find(s=>s.id===x.id); if(!cur) continue;
+    if(hit){cur.lat=hit[0];cur.lng=hit[1];cur.geo="osm";cur.ga=cur.addr||"";cur.gl=[hit[0],hit[1]];delete cur.gfail;changed=true;}
+    else if(!failNet){cur.gfail=(cur.addr||"")+"|"+(cur.name||"");if(cur.geo==="osm"){cur.lat=null;cur.lng=null;delete cur.geo;}changed=true;}
+  }}finally{busy=false;}
+  if(changed){save();try{renderOverlays();}catch(e){}try{renderMetroBar();}catch(e){}try{renderStay();}catch(e){}try{renderStayList();}catch(e){}}
+}
+window.__geocodeStays=geocodeAll;
+/* ---- 圖釘 ---- */
+function drawStays(){
+  if(typeof LM==="undefined"||!LM) return;
+  if(LMstay){LMstay.remove();LMstay=null;}
+  if(!stayOn) return;
+  let cur=null; try{const [x,l]=pickStay(); if(x&&/今晚/.test(l)) cur=x;}catch(e){}
+  LMstay=L.layerGroup();
+  stays.filter(x=>x.lat!=null&&x.lng!=null).forEach(x=>{
+    const isNow=cur&&cur.id===x.id, nm=x.name||T("住宿","Stay");
+    const lab=isNow?T("今晚・","Tonight · ")+nm:nm;
+    const dates=x.ci?`${shortDate(x.ci)}${x.co?"–"+shortDate(x.co):""}`:"";
+    L.marker([x.lat,x.lng],{icon:L.divIcon({className:"",html:`<div class="stay-pin${isNow?" now":""}">${HOUSE}<span>${esc(lab.length>18?lab.slice(0,17)+"…":lab)}</span></div>`,iconSize:[0,0],iconAnchor:[0,0]}),zIndexOffset:isNow?1400:1100,keyboard:true,title:nm})
+     .bindPopup(`<div class="stay-pop"><b>${esc(nm)}</b><small>${esc(dates)}${x.geo==="osm"?T("・位置由地址推算","・located from address"):""}</small>${x.addr?esc(x.addr)+"<br>":""}<a href="https://www.google.com/maps/dir/?api=1&destination=${x.lat},${x.lng}&travelmode=walking" target="_blank" rel="noopener">${T("走路導航","Walk there")}</a><a href="https://www.google.com/maps/dir/?api=1&destination=${x.lat},${x.lng}&travelmode=transit" target="_blank" rel="noopener">${T("大眾運輸","Transit")}</a></div>`,{maxWidth:240,autoPanPaddingTopLeft:[16,140],autoPanPaddingBottomRight:[72,40]})
+     .addTo(LMstay);
+  });
+  LMstay.addTo(LM);
+}
+window.__drawStays=drawStays;
+const _ro=renderOverlays;
+renderOverlays=function(){_ro.apply(this,arguments);try{drawStays();}catch(e){}if(stays.some(need))geocodeAll();};
+/* ---- 「住宿」開關＋找不到位置的提示 ---- */
+const _mb=renderMetroBar;
+renderMetroBar=function(){_mb.apply(this,arguments);
+  const box=$("#metro"); if(!box) return; const ch=box.querySelector(".chips"), tb=box.querySelector("[data-mtrip]");
+  if(ch&&tb&&!ch.querySelector("[data-mstay]")){const b=document.createElement("button");b.className="stc";b.dataset.mstay="";b.setAttribute("aria-pressed",stayOn);b.textContent=T("住宿","Stays");tb.after(b);}
+  const nm=a=>a.map(x=>x.name||x.addr).slice(0,2).join("、")+(a.length>2?" 等":"");
+  const fail=stays.filter(x=>x.lat==null&&x.gfail), pend=stays.filter(x=>x.lat==null&&!x.gfail&&(x.addr||x.name));
+  if(stayOn&&(fail.length||pend.length)){const h=document.createElement("p");h.className="hint";
+    h.textContent=[pend.length?T(`${nm(pend)} 還沒有位置${navigator.onLine?"，正在用地址查詢…":"，有網路時會用地址查詢。"}`,`${pend.length} stay(s) not located yet${navigator.onLine?" — looking up…":" — will look up when online."}`):"",
+      fail.length?T(`${nm(fail)} 用地址查不到位置：到「我的 → 我的住宿」編輯，把地址改成西文完整地址（例如 Carrer de l'Amistat 21, 08005 Barcelona），或人在飯店時按「用目前位置」。`,`${fail.length} stay(s) couldn’t be found from the address: edit in Me → My stays (use the full Spanish address) or tap “Use current location” at the hotel.`):""].filter(Boolean).join(" ");
+    box.appendChild(h);}
+};
+document.addEventListener("click",e=>{const b=e.target.closest("[data-mstay]");if(!b)return;stayOn=!stayOn;ls.set("ss_stay_on",stayOn);try{renderOverlays();renderMetroBar();}catch(err){}
+  // 打開時飛到今晚（或下一間）住宿
+  if(stayOn){try{const [x]=pickStay();if(x&&x.lat!=null&&LM)LM.flyTo([x.lat,x.lng],Math.max(LM.getZoom(),15),{duration:.8});}catch(err){}}});
+/* 存住宿後、回到網路時順便查 */
+const sv=$("#stSave"); if(sv) sv.addEventListener("click",()=>setTimeout(()=>{if(stays.some(need))geocodeAll();},50));
+window.addEventListener("online",()=>{if(stays.some(need))geocodeAll();});
+if(stays.some(need)) setTimeout(geocodeAll,2500);
+})();
 
 /* ===== v3.6 i18n 英文介面 ===== */
 (function(){
